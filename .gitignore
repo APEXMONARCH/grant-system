@@ -1,0 +1,30 @@
+# ─────────────────────────────────────────────────────────────
+#  .gitignore — Grant Management System
+#  Place this at: C:\xampp\htdocs\grant-system\.gitignore
+# ─────────────────────────────────────────────────────────────
+
+# ── Sensitive config — NEVER commit real credentials ─────────
+api/config/constants.php
+
+# ── Uploaded files — can be large and contain personal docs ──
+api/uploads/
+uploads/
+
+# ── Diagnostic / temp files ───────────────────────────────────
+test_api.php
+fix_admin.php
+diagnostic.html
+
+# ── OS & editor junk ──────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+*.log
+*.tmp
+
+# ── PHP error logs ────────────────────────────────────────────
+*.log
+php_error_log
+
+# ── Node / npm (if you ever add build tools) ──────────────────
+node_modules/

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Application Review | Grant Management System</title>
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="stylesheet" href="assets/css/user-dashboard.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="application-detail-page" data-admin-page="application-details">
+    <div class="app-container">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-hand-holding-heart"></i>
+                    <span>Grant Management System</span>
+                </div>
+                <button class="sidebar-toggle" id="sidebarToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="index.html" class="nav-item"><i class="fas fa-tachometer-alt"></i><span>Dashboard</span></a>
+                <a href="grants.html" class="nav-item"><i class="fas fa-file-alt"></i><span>Grants</span></a>
+                <a href="applications.html" class="nav-item active"><i class="fas fa-clipboard-list"></i><span>Applications</span></a>
+                <a href="beneficiaries.html" class="nav-item"><i class="fas fa-users"></i><span>Beneficiaries</span></a>
+                <a href="reports.html" class="nav-item"><i class="fas fa-chart-line"></i><span>Reports</span></a>
+                <a href="settings.html" class="nav-item"><i class="fas fa-cog"></i><span>Settings</span></a>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="user-info-mini"><i class="fas fa-user-circle"></i><span>Admin User</span></div>
+            </div>
+        </aside>
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+        <main class="main-content">
+            <header class="topbar">
+                <button class="mobile-menu-btn" id="mobileMenuBtn"><i class="fas fa-bars"></i></button>
+                <h1 class="page-title">Application Review</h1>
+                <div class="topbar-actions">
+                    <button class="icon-btn" id="notificationBtn"><i class="fas fa-bell"></i><span class="badge">3</span></button>
+                    <div class="profile-dropdown">
+                        <button class="profile-btn" id="profileBtn">
+                            <img src="https://ui-avatars.com/api/?name=Admin+User&background=1a56db&color=fff" alt="Profile" class="avatar">
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="dropdown-menu" id="profileDropdown">
+                            <a href="#"><i class="fas fa-user"></i> Profile</a>
+                            <a href="settings.html"><i class="fas fa-cog"></i> Settings</a>
+                            <hr>
+                            <a href="signup.html" onclick="handleLogout(event)"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="content-wrapper application-detail-shell">
+                <!-- Page Header with Actions -->
+                <div class="page-header detail-page-header">
+                    <div class="header-left">
+                        <h2>Grant Application Details</h2>
+                        <p class="page-description">Review and evaluate lecturer research grant applications</p>
+                    </div>
+                    <div class="header-right detail-page-actions">
+                        <button class="btn-secondary" id="downloadApplicationBtn">
+                            <i class="fas fa-download"></i>
+                            <span>Download Application</span>
+                        </button>
+                        <a class="btn-primary" href="applications.html">
+                            <i class="fas fa-arrow-left"></i>
+                            <span>Back to Applications</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Loading State -->
+                <div id="applicationDetailHero" style="display: none;"></div>
+
+                <!-- Main Application Details Grid -->
+                <div class="application-details-container" id="applicationDetailRoot">
+                    <!-- Content will be populated by JavaScript -->
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="assets/js/api.js"></script>
+    <script src="assets/js/auth.js"></script>
+    <script src="assets/js/app.js"></script>
+    <script src="assets/js/admin-application-details.js"></script>
+</body>
+</html>

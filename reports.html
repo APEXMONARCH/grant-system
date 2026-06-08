@@ -1,0 +1,322 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Reports & Analytics | Grant Management System</title>
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-hand-holding-heart"></i>
+                    <span>Grant Management System</span>
+                </div>
+                <button class="sidebar-toggle" id="sidebarToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="index.html" class="nav-item">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="grants.html" class="nav-item">
+                    <i class="fas fa-file-alt"></i>
+                    <span>Grants</span>
+                </a>
+                <a href="applications.html" class="nav-item">
+                    <i class="fas fa-clipboard-list"></i>
+                    <span>Applications</span>
+                </a>
+                <a href="beneficiaries.html" class="nav-item">
+                    <i class="fas fa-users"></i>
+                    <span>Beneficiaries</span>
+                </a>
+                <a href="reports.html" class="nav-item active">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Reports</span>
+                </a>
+                <a href="settings.html" class="nav-item">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </a>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <div class="user-info-mini">
+                    <i class="fas fa-user-circle"></i>
+                    <span>Admin User</span>
+                </div>
+            </div>
+        </aside>
+        
+        <!-- Mobile overlay -->
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+        
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Topbar -->
+            <header class="topbar">
+                <button class="mobile-menu-btn" id="mobileMenuBtn">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1 class="page-title">Reports & Analytics</h1>
+                <div class="topbar-actions">
+                    <button class="icon-btn" id="notificationBtn">
+                        <i class="fas fa-bell"></i>
+                        <span class="badge">3</span>
+                    </button>
+                    <div class="profile-dropdown">
+                        <button class="profile-btn" id="profileBtn">
+                            <img src="https://ui-avatars.com/api/?name=Admin+User&background=1a56db&color=fff" alt="Profile" class="avatar">
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="dropdown-menu" id="profileDropdown">
+                            <a href="#"><i class="fas fa-user"></i> Profile</a>
+                            <a href="settings.html"><i class="fas fa-cog"></i> Settings</a>
+                            <hr>
+                            <a href="signup.html" onclick="handleLogout(event)"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                        </div>
+                    </div>
+                </div>
+            </header>
+            
+            <!-- Content -->
+            <div class="content-wrapper">
+                <!-- Header Section with Export Button -->
+                <div class="page-header">
+                    <div class="header-left">
+                        <h2>Analytics Dashboard</h2>
+                        <p class="page-description">Comprehensive insights into grant performance and impact</p>
+                    </div>
+                    <div class="header-right">
+                        <button class="btn-primary" id="exportReportBtn">
+                            <i class="fas fa-download"></i>
+                            <span>Export Report</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Filters Section -->
+                <div class="filters-card">
+                    <div class="filters-grid reports-filters">
+                        <div class="filter-group">
+                            <label for="dateRange">Date Range</label>
+                            <select id="dateRange" class="filter-select">
+                                <option value="last7">Last 7 Days</option>
+                                <option value="last30" selected>Last 30 Days</option>
+                                <option value="last90">Last 90 Days</option>
+                                <option value="last6months">Last 6 Months</option>
+                                <option value="lastyear">Last Year</option>
+                                <option value="all">All Time</option>
+                            </select>
+                        </div>
+                        
+                        <div class="filter-group">
+                            <label for="grantType">Grant Type</label>
+                            <select id="grantType" class="filter-select">
+                                <option value="all" selected>All Grants</option>
+                                <option value="business">Business & SME</option>
+                                <option value="research">Research & Innovation</option>
+                                <option value="community">Community Development</option>
+                                <option value="education">Education</option>
+                                <option value="arts">Arts & Culture</option>
+                            </select>
+                        </div>
+                        
+                        <div class="filter-group">
+                            <label for="statusFilter">Status</label>
+                            <select id="statusFilter" class="filter-select">
+                                <option value="all" selected>All Status</option>
+                                <option value="active">Active</option>
+                                <option value="completed">Completed</option>
+                                <option value="pending">Pending</option>
+                            </select>
+                        </div>
+                        
+                        <div class="filter-group search-group">
+                            <label for="applyFilters">&nbsp;</label>
+                            <button class="btn-primary" id="applyFiltersBtn">
+                                <i class="fas fa-sync-alt"></i>
+                                Apply Filters
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Summary Stats -->
+                <div class="stats-grid reports-stats">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-dollar-sign"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Total Funds</h3>
+                            <p class="stat-value" id="totalFunds">$1,420,000</p>
+                            <span class="stat-trend positive">
+                                <i class="fas fa-arrow-up"></i> +18.5%
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon allocated">
+                            <i class="fas fa-chart-pie"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Total Disbursed</h3>
+                            <p class="stat-value" id="totalDisbursed">$1,245,000</p>
+                            <span class="stat-trend positive">
+                                <i class="fas fa-arrow-up"></i> +12.3%
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon remaining">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Beneficiaries</h3>
+                            <p class="stat-value" id="totalBeneficiaries">156</p>
+                            <span class="stat-trend positive">
+                                <i class="fas fa-arrow-up"></i> +8.2%
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Approval Rate</h3>
+                            <p class="stat-value" id="approvalRate">78.5%</p>
+                            <span class="stat-trend positive">
+                                <i class="fas fa-arrow-up"></i> +5.2%
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Charts Grid -->
+                <div class="charts-grid reports-charts">
+                    <!-- Line Chart: Funds Distribution Over Time -->
+                    <div class="card chart-card">
+                        <div class="card-header">
+                            <h2>Funds Distribution Over Time</h2>
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="card-body chart-body">
+                            <canvas id="fundsDistributionChart" class="responsive-chart"></canvas>
+                            <div class="chart-note">Monthly disbursement trends</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Pie Chart: Allocation by Category -->
+                    <div class="card chart-card">
+                        <div class="card-header">
+                            <h2>Allocation by Category</h2>
+                            <i class="fas fa-chart-pie"></i>
+                        </div>
+                        <div class="card-body chart-body">
+                            <canvas id="allocationChart" class="responsive-chart"></canvas>
+                            <div class="chart-legend" id="allocationLegend"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Bar Chart: Approval Rate -->
+                    <div class="card chart-card">
+                        <div class="card-header">
+                            <h2>Approval Rate by Category</h2>
+                            <i class="fas fa-chart-bar"></i>
+                        </div>
+                        <div class="card-body chart-body">
+                            <canvas id="approvalRateChart" class="responsive-chart"></canvas>
+                            <div class="chart-stats" id="approvalStats"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Additional Insights Section -->
+                <div class="insights-grid">
+                    <div class="card insight-card">
+                        <div class="card-header">
+                            <h2>Top Performing Grants</h2>
+                            <i class="fas fa-trophy"></i>
+                        </div>
+                        <div class="card-body">
+                            <div class="insight-list" id="topGrants">
+                                <div class="insight-item">
+                                    <span class="rank">1</span>
+                                    <div class="insight-details">
+                                        <strong>Teah Innovation Fund</strong>
+                                        <span>$750,000 disbursed</span>
+                                    </div>
+                                    <span class="insight-value">96 applicants</span>
+                                </div>
+                                <div class="insight-item">
+                                    <span class="rank">2</span>
+                                    <div class="insight-details">
+                                        <strong>SME Business Growth Grant</strong>
+                                        <span>$260,000 disbursed</span>
+                                    </div>
+                                    <span class="insight-value">100 applicants</span>
+                                </div>
+                                <div class="insight-item">
+                                    <span class="rank">3</span>
+                                    <div class="insight-details">
+                                        <strong>Mount Pond Community Grant</strong>
+                                        <span>$220,000 disbursed</span>
+                                    </div>
+                                    <span class="insight-value">100 applicants</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card insight-card">
+                        <div class="card-header">
+                            <h2>Key Metrics</h2>
+                            <i class="fas fa-chart-simple"></i>
+                        </div>
+                        <div class="card-body">
+                            <div class="metrics-list">
+                                <div class="metric-item">
+                                    <span class="metric-label">Average Grant Size</span>
+                                    <span class="metric-value" id="avgGrantSize">$35,500</span>
+                                </div>
+                                <div class="metric-item">
+                                    <span class="metric-label">Average Processing Time</span>
+                                    <span class="metric-value">14 days</span>
+                                </div>
+                                <div class="metric-item">
+                                    <span class="metric-label">Success Rate</span>
+                                    <span class="metric-value">82%</span>
+                                </div>
+                                <div class="metric-item">
+                                    <span class="metric-label">Total Applications</span>
+                                    <span class="metric-value" id="totalApplications">214</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="assets/js/api.js"></script>
+    <script src="assets/js/auth.js"></script>
+    <script src="assets/js/app.js"></script>
+    <script src="assets/js/reports.js"></script>
+</body>
+</html>

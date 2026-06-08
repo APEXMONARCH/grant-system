@@ -1,0 +1,176 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Applications | Grant Management System</title>
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-hand-holding-heart"></i>
+                    <span>Grant Management System</span>
+                </div>
+                <button class="sidebar-toggle" id="sidebarToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="index.html" class="nav-item">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="grants.html" class="nav-item">
+                    <i class="fas fa-file-alt"></i>
+                    <span>Grants</span>
+                </a>
+                <a href="applications.html" class="nav-item active">
+                    <i class="fas fa-clipboard-list"></i>
+                    <span>Applications</span>
+                </a>
+                <a href="beneficiaries.html" class="nav-item">
+                    <i class="fas fa-users"></i>
+                    <span>Beneficiaries</span>
+                </a>
+                <a href="reports.html" class="nav-item">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Reports</span>
+                </a>
+                <a href="settings.html" class="nav-item">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </a>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <div class="user-info-mini">
+                    <i class="fas fa-user-circle"></i>
+                    <span>Admin User</span>
+                </div>
+            </div>
+        </aside>
+        
+        <!-- Mobile overlay -->
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+        
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Topbar -->
+            <header class="topbar">
+                <button class="mobile-menu-btn" id="mobileMenuBtn">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1 class="page-title">Applications</h1>
+                <div class="topbar-actions">
+                    <button class="icon-btn" id="notificationBtn">
+                        <i class="fas fa-bell"></i>
+                        <span class="badge">3</span>
+                    </button>
+                    <div class="profile-dropdown">
+                        <button class="profile-btn" id="profileBtn">
+                            <img src="https://ui-avatars.com/api/?name=Admin+User&background=1a56db&color=fff" alt="Profile" class="avatar">
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="dropdown-menu" id="profileDropdown">
+                            <a href="#"><i class="fas fa-user"></i> Profile</a>
+                            <a href="settings.html"><i class="fas fa-cog"></i> Settings</a>
+                            <hr>
+                            <a href="signup.html" onclick="handleLogout(event)"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                        </div>
+                    </div>
+                </div>
+            </header>
+            
+            <!-- Content -->
+            <div class="content-wrapper">
+                <!-- Header Section -->
+                <div class="page-header">
+                    <div class="header-left">
+                        <h2>Grant Applications</h2>
+                        <p class="page-description">Manage and track all grant applications across different stages</p>
+                    </div>
+                    <div class="header-right">
+                        <div class="stats-badge">
+                            <i class="fas fa-chart-line"></i>
+                            <span id="totalAppsCount">Loading…</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Kanban Board Container (ONLY element with horizontal scroll) -->
+                <div class="kanban-container">
+                    <!-- Submitted Column -->
+                    <div class="kanban-column submitted">
+                        <div class="column-header">
+                            <div class="column-title">
+                                <i class="fas fa-paper-plane"></i>
+                                <h3>Submitted</h3>
+                            </div>
+                            <span class="column-count" id="submittedCount">0</span>
+                        </div>
+                        <div class="column-cards" id="submittedColumn">
+                            <!-- Cards will be populated by JavaScript -->
+                        </div>
+                    </div>
+                    
+                    <!-- Under Review Column -->
+                    <div class="kanban-column under-review">
+                        <div class="column-header">
+                            <div class="column-title">
+                                <i class="fas fa-eye"></i>
+                                <h3>Under Review</h3>
+                            </div>
+                            <span class="column-count" id="reviewCount">0</span>
+                        </div>
+                        <div class="column-cards" id="reviewColumn">
+                            <!-- Cards will be populated by JavaScript -->
+                        </div>
+                    </div>
+                    
+                    <!-- Approved Column -->
+                    <div class="kanban-column approved">
+                        <div class="column-header">
+                            <div class="column-title">
+                                <i class="fas fa-check-circle"></i>
+                                <h3>Approved</h3>
+                            </div>
+                            <span class="column-count" id="approvedCount">0</span>
+                        </div>
+                        <div class="column-cards" id="approvedColumn">
+                            <!-- Cards will be populated by JavaScript -->
+                        </div>
+                    </div>
+                    
+                    <!-- Rejected Column -->
+                    <div class="kanban-column rejected">
+                        <div class="column-header">
+                            <div class="column-title">
+                                <i class="fas fa-times-circle"></i>
+                                <h3>Rejected</h3>
+                            </div>
+                            <span class="column-count" id="rejectedCount">0</span>
+                        </div>
+                        <div class="column-cards" id="rejectedColumn">
+                            <!-- Cards will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script src="assets/js/api.js"></script>
+    <script src="assets/js/auth.js"></script>
+    <script src="assets/js/api.js"></script>
+    <script src="assets/js/auth.js"></script>
+    <script src="assets/js/app.js"></script>
+    <script src="assets/js/applications.js"></script>
+</body>
+</html>

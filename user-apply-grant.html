@@ -1,0 +1,201 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Apply | User Portal</title>
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="stylesheet" href="assets/css/user-dashboard.css">
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="user-shell" data-user-page="apply">
+    <div class="app-container">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header"><div class="logo"><i class="fas fa-hand-holding-heart"></i><span>User Portal</span></div><button class="sidebar-toggle" id="sidebarToggle"><i class="fas fa-bars"></i></button></div>
+            <nav class="sidebar-nav">
+                <a href="user-index.html" class="nav-item"><i class="fas fa-gauge"></i><span>Dashboard</span></a>
+                <a href="user-grants-browse.html" class="nav-item"><i class="fas fa-compass"></i><span>Browse Grants</span></a>
+                <a href="user-apply-grant.html" class="nav-item active"><i class="fas fa-pen-to-square"></i><span>Apply</span></a>
+                <a href="user-applications.html" class="nav-item"><i class="fas fa-folder-open"></i><span>My Applications</span></a>
+                <a href="user-messages.html" class="nav-item"><i class="fas fa-envelope-open-text"></i><span>Messages</span></a>
+                <a href="user-profile.html" class="nav-item"><i class="fas fa-user-gear"></i><span>Profile</span></a>
+            </nav>
+            <div class="sidebar-footer"><div class="user-info-mini"><i class="fas fa-user-circle"></i><span id="userMiniName">Applicant User</span></div></div>
+        </aside>
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+        <main class="main-content">
+            <header class="topbar">
+                <button class="mobile-menu-btn" id="mobileMenuBtn"><i class="fas fa-bars"></i></button>
+                <h1 class="page-title">Apply For Grant</h1>
+                <div class="topbar-actions">
+                    <button class="icon-btn" id="notificationBtn"><i class="fas fa-bell"></i><span class="badge" id="topNotificationCount">0</span></button>
+                    <div class="profile-dropdown"><button class="profile-btn" id="profileBtn"><img class="avatar" id="topAvatar" src="https://ui-avatars.com/api/?name=Applicant+User&background=0b6bcb&color=fff" alt="Profile"><i class="fas fa-chevron-down"></i></button><div class="dropdown-menu" id="profileDropdown"><a href="user-profile.html"><i class="fas fa-user"></i> Profile</a><a href="user-messages.html"><i class="fas fa-envelope"></i> Messages</a><hr><a href="signup.html" onclick="handleLogout(event)"><i class="fas fa-sign-out-alt"></i> Logout</a></div></div>
+                </div>
+            </header>
+
+            <div class="content-wrapper">
+                <section class="user-hero"><h2>Submit A New Application</h2><p>Complete the form below. You can edit your profile details from the profile page modal any time.</p></section>
+                <section class="card">
+                    <div class="card-header"><h2>Application Form</h2></div>
+                    <div class="card-body">
+                        <form id="applyForm">
+                            <div class="apply-progress-wrap">
+                                <div class="apply-progress-bar"><span id="applyProgressBar"></span></div>
+                                <p id="applyProgressText">Step 1 of 6</p>
+                            </div>
+
+                            <div class="apply-step-indicator" id="applyStepIndicator">
+                                <button type="button" class="apply-step-pill active" data-step="1">1. Applicant</button>
+                                <button type="button" class="apply-step-pill" data-step="2">2. Research</button>
+                                <button type="button" class="apply-step-pill" data-step="3">3. Budget</button>
+                                <button type="button" class="apply-step-pill" data-step="4">4. Impact</button>
+                                <button type="button" class="apply-step-pill" data-step="5">5. Uploads</button>
+                                <button type="button" class="apply-step-pill" data-step="6">6. Review</button>
+                            </div>
+
+                            <div class="apply-grant-context" id="applyGrantContext" hidden></div>
+
+                            <section class="apply-step-panel active" data-step="1">
+                                <h3 class="apply-step-title">Step 1 - Applicant Information</h3>
+                                <div class="user-form-row">
+                                    <div class="user-form-group"><label for="appFullName">Full Name</label><input id="appFullName" required></div>
+                                    <div class="user-form-group"><label for="appStaffId">Staff ID</label><input id="appStaffId" required></div>
+                                </div>
+                                <div class="user-form-row">
+                                    <div class="user-form-group"><label for="appInstitution">University/Institution</label><input id="appInstitution" required></div>
+                                    <div class="user-form-group"><label for="appFaculty">Faculty/Department</label><input id="appFaculty" required></div>
+                                </div>
+                                <div class="user-form-row">
+                                    <div class="user-form-group"><label for="appRank">Academic Rank</label><input id="appRank" placeholder="e.g. Senior Lecturer" required></div>
+                                    <div class="user-form-group"><label for="appEmail">Email Address</label><input id="appEmail" type="email" required></div>
+                                </div>
+                                <div class="user-form-row">
+                                    <div class="user-form-group"><label for="appPhone">Phone Number</label><input id="appPhone" type="tel" required></div>
+                                </div>
+                            </section>
+
+                            <section class="apply-step-panel" data-step="2" hidden>
+                                <h3 class="apply-step-title">Step 2 - Research Information</h3>
+                                <div class="user-form-row">
+                                    <div class="user-form-group"><label for="researchTitle">Research Title</label><input id="researchTitle" required></div>
+                                    <div class="user-form-group"><label for="researchArea">Research Area/Discipline</label><input id="researchArea" required></div>
+                                </div>
+                                <div class="user-form-row">
+                                    <div class="user-form-group"><label for="researchCategory">Research Category</label><select id="researchCategory" required><option value="">Select category</option><option>Basic Research</option><option>Applied Research</option><option>Interdisciplinary Research</option><option>Innovation and Commercialization</option><option>Policy and Community Research</option></select></div>
+                                    <div class="user-form-group"><label for="researchDuration">Research Duration</label><select id="researchDuration" required><option value="">Select duration</option><option value="6">6 Months</option><option value="12">12 Months</option><option value="18">18 Months</option><option value="24">24 Months</option><option value="36">36 Months</option></select></div>
+                                </div>
+                                <div class="user-form-row">
+                                    <div class="user-form-group"><label for="researchLocation">Research Location</label><input id="researchLocation" required></div>
+                                </div>
+                                <div class="user-form-group"><label for="researchAbstract">Abstract</label><textarea id="researchAbstract" rows="4" required></textarea></div>
+                                <div class="user-form-group"><label for="researchProblem">Problem Statement</label><textarea id="researchProblem" rows="4" required></textarea></div>
+                                <div class="user-form-group"><label for="researchObjectives">Research Objectives</label><textarea id="researchObjectives" rows="4" required></textarea></div>
+                                <div class="user-form-group"><label for="researchOutcomes">Expected Outcomes</label><textarea id="researchOutcomes" rows="4" required></textarea></div>
+                            </section>
+
+                            <section class="apply-step-panel" data-step="3" hidden>
+                                <h3 class="apply-step-title">Step 3 - Funding and Budget</h3>
+                                <div class="user-form-row">
+                                    <div class="user-form-group"><label for="applyAmount">Requested Amount</label><input type="number" id="applyAmount" min="1" step="0.01" required></div>
+                                    <div class="user-form-group"><label for="applyCurrency">Currency</label><select id="applyCurrency" required><option value="">Select currency</option><option value="USD">USD</option><option value="EUR">EUR</option><option value="GBP">GBP</option><option value="NGN">NGN</option><option value="KES">KES</option><option value="GHS">GHS</option></select></div>
+                                </div>
+                                <div class="user-form-row">
+                                    <div class="user-form-group"><label for="proposedStartDate">Proposed Start Date</label><input type="date" id="proposedStartDate" required></div>
+                                    <div class="user-form-group"><label for="proposedEndDate">Proposed End Date</label><input type="date" id="proposedEndDate" required></div>
+                                </div>
+
+                                <div class="budget-block">
+                                    <div class="budget-head">
+                                        <h4>Budget Breakdown</h4>
+                                        <button type="button" class="btn btn-secondary btn-small" id="addBudgetRow"><i class="fas fa-plus"></i> Add Row</button>
+                                    </div>
+                                    <div class="budget-table-wrap">
+                                        <table class="budget-table">
+                                            <thead>
+                                                <tr><th>Item</th><th>Description</th><th>Estimated Cost</th><th></th></tr>
+                                            </thead>
+                                            <tbody id="budgetRowsBody"></tbody>
+                                        </table>
+                                    </div>
+                                    <div class="budget-total">Total Estimated Budget: <strong id="budgetTotal">0.00</strong></div>
+                                </div>
+                            </section>
+
+                            <section class="apply-step-panel" data-step="4" hidden>
+                                <h3 class="apply-step-title">Step 4 - Research Impact</h3>
+                                <div class="user-form-group"><label for="impactBeneficiaries">Target Beneficiaries</label><textarea id="impactBeneficiaries" rows="4" required></textarea></div>
+                                <div class="user-form-group"><label for="impactSocietal">Societal Impact</label><textarea id="impactSocietal" rows="4" required></textarea></div>
+                                <div class="user-form-group"><label for="impactAcademic">Academic Contribution</label><textarea id="impactAcademic" rows="4" required></textarea></div>
+                                <div class="user-form-group"><label for="impactInnovation">Innovation/Originality</label><textarea id="impactInnovation" rows="4" required></textarea></div>
+                                <div class="user-form-group"><label for="impactRisk">Risk Assessment</label><textarea id="impactRisk" rows="4" required></textarea></div>
+                            </section>
+
+                            <section class="apply-step-panel" data-step="5" hidden>
+                                <h3 class="apply-step-title">Step 5 - Document Uploads</h3>
+                                <p class="ud-stat-note">Accepted formats: PDF, DOC, DOCX. Maximum file size: 10 MB.</p>
+                                <div class="upload-grid">
+                                    <div class="upload-card" data-upload-key="proposal" data-required="true">
+                                        <label>Research Proposal PDF <span class="required-mark">*</span></label>
+                                        <div class="upload-dropzone" data-input="uploadProposal" data-name="uploadProposalName">Drop file here or click to upload<input type="file" id="uploadProposal" accept=".pdf,.doc,.docx" hidden></div>
+                                        <p class="upload-file-name" id="uploadProposalName">No file selected</p>
+                                    </div>
+                                    <div class="upload-card" data-upload-key="cv" data-required="true">
+                                        <label>Curriculum Vitae (CV) <span class="required-mark">*</span></label>
+                                        <div class="upload-dropzone" data-input="uploadCv" data-name="uploadCvName">Drop file here or click to upload<input type="file" id="uploadCv" accept=".pdf,.doc,.docx" hidden></div>
+                                        <p class="upload-file-name" id="uploadCvName">No file selected</p>
+                                    </div>
+                                    <div class="upload-card" data-upload-key="publications" data-required="true">
+                                        <label>Publication List <span class="required-mark">*</span></label>
+                                        <div class="upload-dropzone" data-input="uploadPublications" data-name="uploadPublicationsName">Drop file here or click to upload<input type="file" id="uploadPublications" accept=".pdf,.doc,.docx" hidden></div>
+                                        <p class="upload-file-name" id="uploadPublicationsName">No file selected</p>
+                                    </div>
+                                    <div class="upload-card" data-upload-key="approvalLetter" data-required="true">
+                                        <label>Institutional Approval Letter <span class="required-mark">*</span></label>
+                                        <div class="upload-dropzone" data-input="uploadApprovalLetter" data-name="uploadApprovalLetterName">Drop file here or click to upload<input type="file" id="uploadApprovalLetter" accept=".pdf,.doc,.docx" hidden></div>
+                                        <p class="upload-file-name" id="uploadApprovalLetterName">No file selected</p>
+                                    </div>
+                                    <div class="upload-card" data-upload-key="previousEvidence" data-required="false">
+                                        <label>Previous Research Evidence (Optional)</label>
+                                        <div class="upload-dropzone" data-input="uploadPreviousEvidence" data-name="uploadPreviousEvidenceName">Drop file here or click to upload<input type="file" id="uploadPreviousEvidence" accept=".pdf,.doc,.docx" hidden></div>
+                                        <p class="upload-file-name" id="uploadPreviousEvidenceName">No file selected</p>
+                                    </div>
+                                    <div class="upload-card" data-upload-key="supportingDocs" data-required="false">
+                                        <label>Supporting Documents (Optional)</label>
+                                        <div class="upload-dropzone" data-input="uploadSupportingDocs" data-name="uploadSupportingDocsName">Drop file here or click to upload<input type="file" id="uploadSupportingDocs" accept=".pdf,.doc,.docx" hidden></div>
+                                        <p class="upload-file-name" id="uploadSupportingDocsName">No file selected</p>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <section class="apply-step-panel" data-step="6" hidden>
+                                <h3 class="apply-step-title">Step 6 - Review and Declaration</h3>
+                                <div class="apply-review" id="applyReviewSummary"></div>
+                                <div class="user-form-group apply-declaration-check">
+                                    <label for="declarationCheck"><input type="checkbox" id="declarationCheck" required> I certify that all information provided is accurate.</label>
+                                </div>
+                                <div class="user-form-row">
+                                    <div class="user-form-group"><label for="digitalSignature">Digital Signature</label><input id="digitalSignature" placeholder="Type full name as signature" required></div>
+                                    <div class="user-form-group"><label for="declarationDate">Date</label><input type="date" id="declarationDate" required></div>
+                                </div>
+                            </section>
+
+                            <div class="apply-form-actions">
+                                <button class="btn btn-secondary" id="prevStepBtn" type="button" disabled><i class="fas fa-arrow-left"></i> Previous</button>
+                                <button class="btn btn-primary" id="nextStepBtn" type="button">Next <i class="fas fa-arrow-right"></i></button>
+                                <button class="btn btn-primary" id="submitApplicationBtn" type="submit" hidden><i class="fas fa-paper-plane"></i> Submit Application</button>
+                            </div>
+                        </form>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+    <script src="assets/js/api.js"></script>
+    <script src="assets/js/auth.js"></script>
+    <script src="assets/js/app.js"></script>
+    <script src="assets/js/user-dashboard.js"></script>
+</body>
+</html>
+

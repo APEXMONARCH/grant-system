@@ -1,0 +1,268 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Settings | Grant Management System</title>
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-hand-holding-heart"></i>
+                    <span>Grant Management System</span>
+                </div>
+                <button class="sidebar-toggle" id="sidebarToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="index.html" class="nav-item">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="grants.html" class="nav-item">
+                    <i class="fas fa-file-alt"></i>
+                    <span>Grants</span>
+                </a>
+                <a href="applications.html" class="nav-item">
+                    <i class="fas fa-clipboard-list"></i>
+                    <span>Applications</span>
+                </a>
+                <a href="beneficiaries.html" class="nav-item">
+                    <i class="fas fa-users"></i>
+                    <span>Beneficiaries</span>
+                </a>
+                <a href="reports.html" class="nav-item">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Reports</span>
+                </a>
+                <a href="settings.html" class="nav-item active">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </a>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <div class="user-info-mini">
+                    <i class="fas fa-user-circle"></i>
+                    <span>Admin User</span>
+                </div>
+            </div>
+        </aside>
+        
+        <!-- Mobile overlay -->
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+        
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Topbar -->
+            <header class="topbar">
+                <button class="mobile-menu-btn" id="mobileMenuBtn">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1 class="page-title">Settings</h1>
+                <div class="topbar-actions">
+                    <button class="icon-btn" id="notificationBtn">
+                        <i class="fas fa-bell"></i>
+                        <span class="badge">3</span>
+                    </button>
+                    <div class="profile-dropdown">
+                        <button class="profile-btn" id="profileBtn">
+                            <img src="https://ui-avatars.com/api/?name=Admin+User&background=1a56db&color=fff" alt="Profile" class="avatar">
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="dropdown-menu" id="profileDropdown">
+                            <a href="#"><i class="fas fa-user"></i> Profile</a>
+                            <a href="settings.html"><i class="fas fa-cog"></i> Settings</a>
+                            <hr>
+                            <a href="signup.html" onclick="handleLogout(event)"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                        </div>
+                    </div>
+                </div>
+            </header>
+            
+            <!-- Content -->
+            <div class="content-wrapper">
+                <!-- Header Section -->
+                <div class="page-header">
+                    <div class="header-left">
+                        <h2>System Settings</h2>
+                        <p class="page-description">Manage users, roles, and notification preferences</p>
+                    </div>
+                </div>
+                
+                <!-- Tabs Navigation -->
+                <div class="tabs-container">
+                    <div class="tabs-nav">
+                        <button class="tab-btn active" data-tab="users">
+                            <i class="fas fa-users"></i>
+                            <span>User Management</span>
+                        </button>
+                        <button class="tab-btn" data-tab="roles">
+                            <i class="fas fa-shield-alt"></i>
+                            <span>Roles & Permissions</span>
+                        </button>
+                        <button class="tab-btn" data-tab="notifications">
+                            <i class="fas fa-bell"></i>
+                            <span>Notifications</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Tab Content: User Management -->
+                <div class="tab-content active" id="users-tab">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2>System Users</h2>
+                            <button class="btn btn-primary btn-small" id="addUserBtn">
+                                <i class="fas fa-plus"></i>
+                                Add User
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="data-table users-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Email</th>
+                                            <th>Role</th>
+                                            <th>Status</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="usersTableBody">
+                                        <!-- Users will be populated by JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Tab Content: Roles & Permissions -->
+                <div class="tab-content" id="roles-tab">
+                    <div class="roles-grid" id="rolesGrid">
+                        <!-- Role cards will be populated by JavaScript -->
+                    </div>
+                </div>
+                
+                <!-- Tab Content: Notifications -->
+                <div class="tab-content" id="notifications-tab">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2>Notification Preferences</h2>
+                        </div>
+                        <div class="card-body">
+                            <div class="notifications-list">
+                                <div class="notification-item">
+                                    <div class="notification-info">
+                                        <i class="fas fa-envelope"></i>
+                                        <div class="notification-details">
+                                            <h4>Email Notifications</h4>
+                                            <p>Receive email updates about grants, applications, and system alerts</p>
+                                        </div>
+                                    </div>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="emailNotifications" checked>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                                
+                                <div class="notification-item">
+                                    <div class="notification-info">
+                                        <i class="fas fa-bell"></i>
+                                        <div class="notification-details">
+                                            <h4>System Alerts</h4>
+                                            <p>Get notified about system updates and maintenance</p>
+                                        </div>
+                                    </div>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="systemAlerts" checked>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                                
+                                <div class="notification-item">
+                                    <div class="notification-info">
+                                        <i class="fas fa-file-alt"></i>
+                                        <div class="notification-details">
+                                            <h4>New Applications</h4>
+                                            <p>Receive alerts when new grant applications are submitted</p>
+                                        </div>
+                                    </div>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="newApplications" checked>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                                
+                                <div class="notification-item">
+                                    <div class="notification-info">
+                                        <i class="fas fa-check-circle"></i>
+                                        <div class="notification-details">
+                                            <h4>Application Status Updates</h4>
+                                            <p>Get notified when applications are reviewed or approved</p>
+                                        </div>
+                                    </div>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="statusUpdates" checked>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                                
+                                <div class="notification-item">
+                                    <div class="notification-info">
+                                        <i class="fas fa-calendar-alt"></i>
+                                        <div class="notification-details">
+                                            <h4>Deadline Reminders</h4>
+                                            <p>Receive reminders about upcoming grant deadlines</p>
+                                        </div>
+                                    </div>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="deadlineReminders" checked>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                                
+                                <div class="notification-item">
+                                    <div class="notification-info">
+                                        <i class="fas fa-chart-line"></i>
+                                        <div class="notification-details">
+                                            <h4>Weekly Reports</h4>
+                                            <p>Get weekly summary reports of system activity</p>
+                                        </div>
+                                    </div>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="weeklyReports">
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div class="notification-actions">
+                                <button class="btn-secondary" id="saveNotificationsBtn">
+                                    <i class="fas fa-save"></i>
+                                    Save Preferences
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script src="assets/js/api.js"></script>
+    <script src="assets/js/auth.js"></script>
+    <script src="assets/js/app.js"></script>
+    <script src="assets/js/settings.js"></script>
+</body>
+</html>

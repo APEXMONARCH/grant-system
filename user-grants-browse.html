@@ -1,0 +1,70 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Browse Grants | User Portal</title>
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="stylesheet" href="assets/css/user-dashboard.css">
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="user-shell" data-user-page="grants">
+    <div class="app-container">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header"><div class="logo"><i class="fas fa-hand-holding-heart"></i><span>User Portal</span></div><button class="sidebar-toggle" id="sidebarToggle"><i class="fas fa-bars"></i></button></div>
+            <nav class="sidebar-nav">
+                <a href="user-index.html" class="nav-item"><i class="fas fa-gauge"></i><span>Dashboard</span></a>
+                <a href="user-grants-browse.html" class="nav-item active"><i class="fas fa-compass"></i><span>Browse Grants</span></a>
+                <a href="user-apply-grant.html" class="nav-item"><i class="fas fa-pen-to-square"></i><span>Apply</span></a>
+                <a href="user-applications.html" class="nav-item"><i class="fas fa-folder-open"></i><span>My Applications</span></a>
+                <a href="user-messages.html" class="nav-item"><i class="fas fa-envelope-open-text"></i><span>Messages</span></a>
+                <a href="user-profile.html" class="nav-item"><i class="fas fa-user-gear"></i><span>Profile</span></a>
+            </nav>
+            <div class="sidebar-footer"><div class="user-info-mini"><i class="fas fa-user-circle"></i><span id="userMiniName">Applicant User</span></div></div>
+        </aside>
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+        <main class="main-content">
+            <header class="topbar">
+                <button class="mobile-menu-btn" id="mobileMenuBtn"><i class="fas fa-bars"></i></button>
+                <h1 class="page-title">Browse Grants</h1>
+                <div class="topbar-actions">
+                    <button class="icon-btn" id="notificationBtn"><i class="fas fa-bell"></i><span class="badge" id="topNotificationCount">0</span></button>
+                    <div class="profile-dropdown"><button class="profile-btn" id="profileBtn"><img class="avatar" id="topAvatar" src="https://ui-avatars.com/api/?name=Applicant+User&background=0b6bcb&color=fff" alt="Profile"><i class="fas fa-chevron-down"></i></button><div class="dropdown-menu" id="profileDropdown"><a href="user-profile.html"><i class="fas fa-user"></i> Profile</a><a href="user-messages.html"><i class="fas fa-envelope"></i> Messages</a><hr><a href="signup.html" onclick="handleLogout(event)"><i class="fas fa-sign-out-alt"></i> Logout</a></div></div>
+                </div>
+            </header>
+
+            <div class="content-wrapper">
+                <section class="user-hero"><h2>Explore Open Grants</h2><p>Use filters to find grants that match your organization and apply before deadlines.</p></section>
+
+                <section class="card">
+                    <div class="card-body user-toolbar">
+                        <div class="user-form-group"><label for="grantSearch">Search</label><input id="grantSearch" placeholder="Grant name"></div>
+                        <div class="user-form-group"><label for="grantCategory">Category</label><select id="grantCategory"><option value="">All</option><option value="Business">Business</option><option value="Research">Research</option><option value="Education">Education</option><option value="Community">Community</option><option value="Arts">Arts</option></select></div>
+                        <div class="user-form-group"><label for="grantStatus">Status</label><select id="grantStatus"><option value="">Any</option><option value="open">Open</option><option value="closing">Closing Soon</option><option value="closed">Closed</option></select></div>
+                        <button class="btn btn-secondary" id="clearGrantFilters"><i class="fas fa-rotate-left"></i> Reset</button>
+                    </div>
+                </section>
+
+                <section class="card">
+                    <div class="card-header"><h2>Available Grants</h2><span class="ud-stat-note" id="grantsResultNote"></span></div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead><tr><th>Grant</th><th>Category</th><th>Max Amount</th><th>Deadline</th><th>Status</th><th>Action</th></tr></thead>
+                                <tbody id="grantsRows"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+    <script src="assets/js/api.js"></script>
+    <script src="assets/js/auth.js"></script>
+    <script src="assets/js/app.js"></script>
+    <script src="assets/js/user-dashboard.js"></script>
+</body>
+</html>
+
