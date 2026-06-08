@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Grant Management System
 
 A full-stack grant management platform for universities and research institutions. Admins can create and manage grants, review applications via a Kanban board, and track disbursements. Applicants can browse grants, submit multi-step applications with document uploads, and receive status notifications.
@@ -180,3 +181,7 @@ When deploying to a live server:
 4. Set `DEV_MODE = false` in `auth.js`
 5. Remove `test_api.php`, `fix_admin.php`, `diagnostic.html` if present
 6. Make `api/uploads/` writable: `chmod -R 775 api/uploads/`
+=======
+# grant-system
+final year project
+>>>>>>> ddc68412fc5ee3c258baa7609abb9a1c7660aea6
