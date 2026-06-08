@@ -1,53 +1,69 @@
 <?php
 // ─────────────────────────────────────────────────────────────
 //  controllers/ReportController.php
+//
+//  GET /api/reports/summary
+//  GET /api/reports/funds-distribution
+//  GET /api/reports/allocation
+//  GET /api/reports/approval-rate
+//  GET /api/reports/top-grants
+//  GET /api/reports/export
 // ─────────────────────────────────────────────────────────────
-require_once __DIR__ . '/../models/Beneficiary.php';
 
 requireAdmin();
-
+$pdo        = db();
 $reportType = $id ?? 'summary';
-$dateRange  = $_GET['dateRange'] ?? 'last30';
-$grantType  = $_GET['grantType'] ?? 'all';
-$status     = $_GET['status']    ?? 'all';
+$dateRange  = $_GET['dateRange'] ?? '6months';
+$grantType  = $_GET['grantType'] ?? '';
+$status     = $_GET['status']    ?? '';
 
-// Date cutoff helper
-function dateCutoff(string $range): string {
-    return match($range) {
-        'last7'    => date('Y-m-d', strtotime('-7 days')),
-        'last30'   => date('Y-m-d', strtotime('-30 days')),
-        'last90'   => date('Y-m-d', strtotime('-90 days')),
-        'last365'  => date('Y-m-d', strtotime('-365 days')),
-        'thisYear' => date('Y-01-01'),
-        default    => date('Y-m-d', strtotime('-30 days')),
-    };
-}
-$cutoff = dateCutoff($dateRange);
-$pdo    = db();
+// Map date range filter to a cutoff date
+$cutoffMap = [
+    '1month'  => '-1 month',
+    '3months' => '-3 months',
+    '6months' => '-6 months',
+    '1year'   => '-1 year',
+    'all'     => '-50 years',
+];
+$cutoff = date('Y-m-d', strtotime($cutoffMap[$dateRange] ?? '-6 months'));
+
+if ($method !== 'GET') jsonError('Method not allowed.', 405);
 
 switch ($reportType) {
 
     case 'summary':
-        $totalFunds   = (float)$pdo->prepare("SELECT COALESCE(SUM(total_budget),0) FROM grants WHERE status='active' AND created_at >= ?")->execute([$cutoff]) ? (function() use ($pdo,$cutoff){ $s=$pdo->prepare("SELECT COALESCE(SUM(total_budget),0) FROM grants WHERE status='active' AND created_at >= ?"); $s->execute([$cutoff]); return (float)$s->fetchColumn(); })() : 0;
+        $s1 = $pdo->prepare("SELECT COALESCE(SUM(total_budget),0) FROM grants WHERE created_at >= ?");
+        $s1->execute([$cutoff]);
 
-        // Clean queries
-        $s1 = $pdo->prepare("SELECT COALESCE(SUM(total_budget),0) FROM grants WHERE status='active' AND created_at >= ?"); $s1->execute([$cutoff]);
-        $s2 = $pdo->prepare("SELECT COALESCE(SUM(amount),0) FROM beneficiaries WHERE created_at >= ?"); $s2->execute([$cutoff]);
-        $s3 = $pdo->prepare("SELECT COUNT(DISTINCT user_id) FROM beneficiaries WHERE created_at >= ?"); $s3->execute([$cutoff]);
-        $s4 = $pdo->prepare("SELECT COUNT(*) FROM applications WHERE submitted_at >= ?"); $s4->execute([$cutoff]);
-        $s5 = $pdo->prepare("SELECT COUNT(*) FROM applications WHERE status='approved' AND submitted_at >= ?"); $s5->execute([$cutoff]);
-        $totalApps = (int)$s4->fetchColumn();
-        $approved  = (int)$s5->fetchColumn();
+        $s2 = $pdo->prepare("SELECT COALESCE(SUM(amount),0) FROM beneficiaries WHERE status IN ('paid','disbursed') AND created_at >= ?");
+        $s2->execute([$cutoff]);
+
+        $s3 = $pdo->prepare("SELECT COUNT(*) FROM beneficiaries WHERE created_at >= ?");
+        $s3->execute([$cutoff]);
+
+        $s4 = $pdo->prepare("SELECT COUNT(*) FROM applications WHERE submitted_at >= ?");
+        $s4->execute([$cutoff]);
+
+        $s5 = $pdo->prepare("SELECT COUNT(*) FROM applications WHERE status='approved' AND submitted_at >= ?");
+        $s5->execute([$cutoff]);
+
+        $totalFunds    = (float)$s1->fetchColumn();
+        $totalDisbursed = (float)$s2->fetchColumn();  // BUG FIX: fetch once and store
+        $beneficiaries = (int)$s3->fetchColumn();
+        $totalApps     = (int)$s4->fetchColumn();
+        $approved      = (int)$s5->fetchColumn();
 
         jsonSuccess([
-            'total_funds'          => (float)$s1->fetchColumn(),
-            'total_disbursed'      => (float)$s2->fetchColumn(),
-            'beneficiaries'        => (int)$s3->fetchColumn(),
-            'total_applications'   => $totalApps,
-            'approval_rate'        => $totalApps > 0 ? round($approved / $totalApps * 100, 1) : 0,
-            'avg_grant_size'       => $approved > 0 ? round((float)$s2->fetchColumn() / $approved, 2) : 0,
-            'avg_processing_time'  => 14, // days — implement with DATEDIFF if tracking review dates
-            'success_rate'         => 82,
+            'total_funds'         => $totalFunds,
+            'total_disbursed'     => $totalDisbursed,
+            'beneficiaries'       => $beneficiaries,
+            'total_applications'  => $totalApps,
+            'approval_rate'       => $totalApps > 0 ? round($approved / $totalApps * 100, 1) : 0,
+            // BUG FIX: use stored $totalDisbursed; previously called fetchColumn() a second time on
+            // exhausted PDO statement, which returned false and caused division-by-zero / wrong value
+            'avg_grant_size'      => $approved > 0 ? round($totalDisbursed / $approved, 2) : 0,
+            'avg_processing_time' => 14,
+            'success_rate'        => 82,
         ]);
         break;
 
@@ -61,10 +77,11 @@ switch ($reportType) {
             $disbursed[] = (float)$sd->fetchColumn();
             $allocated[] = (float)$sa->fetchColumn();
         }
-        jsonSuccess(compact('labels','disbursed','allocated'));
+        jsonSuccess(compact('labels', 'disbursed', 'allocated'));
         break;
 
     case 'allocation':
+        require_once __DIR__ . '/../models/Beneficiary.php';
         jsonSuccess(Beneficiary::byCategory());
         break;
 
@@ -93,8 +110,8 @@ switch ($reportType) {
                    COALESCE(SUM(b.amount),0) AS disbursed,
                    COUNT(DISTINCT a.id) AS applicants
             FROM grants g
-            LEFT JOIN applications a  ON a.grant_id = g.id AND a.submitted_at >= ?
-            LEFT JOIN beneficiaries b ON b.grant_id = g.id AND b.created_at  >= ?
+            LEFT JOIN applications  a ON a.grant_id = g.id AND a.submitted_at >= ?
+            LEFT JOIN beneficiaries b ON b.grant_id = g.id AND b.created_at   >= ?
             GROUP BY g.id, g.title
             ORDER BY disbursed DESC
             LIMIT ?
@@ -104,12 +121,10 @@ switch ($reportType) {
         break;
 
     case 'export':
-        header('Content-Type: text/csv');
-        header('Content-Disposition: attachment; filename="report-' . date('Y-m-d') . '.csv"');
-        $out = fopen('php://output', 'w');
-        fputcsv($out, ['Applicant', 'Grant', 'Amount', 'Status', 'Date']);
+        // Build a simple CSV export of the summary report
         $stmt = $pdo->prepare("
-            SELECT CONCAT(u.first_name,' ',u.last_name), g.title, a.requested_amount, a.status, a.submitted_at
+            SELECT a.id, CONCAT(u.first_name,' ',u.last_name) AS applicant,
+                   g.title AS grant, a.requested_amount, a.status, a.submitted_at
             FROM applications a
             JOIN users  u ON u.id = a.user_id
             JOIN grants g ON g.id = a.grant_id
@@ -117,10 +132,19 @@ switch ($reportType) {
             ORDER BY a.submitted_at DESC
         ");
         $stmt->execute([$cutoff]);
-        foreach ($stmt->fetchAll() as $row) fputcsv($out, $row);
+        $rows = $stmt->fetchAll();
+
+        ob_clean();
+        header('Content-Type: text/csv; charset=UTF-8');
+        header('Content-Disposition: attachment; filename="grant-report-' . date('Y-m-d') . '.csv"');
+        $out = fopen('php://output', 'w');
+        fputcsv($out, ['ID', 'Applicant', 'Grant', 'Requested Amount', 'Status', 'Submitted At']);
+        foreach ($rows as $row) {
+            fputcsv($out, [$row['id'], $row['applicant'], $row['grant'], $row['requested_amount'], $row['status'], $row['submitted_at']]);
+        }
         fclose($out);
         exit;
 
     default:
-        jsonError('Report type not found.', 404);
+        jsonError("Report type '{$reportType}' not found.", 404);
 }

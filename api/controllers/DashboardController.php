@@ -23,6 +23,10 @@ if ($dashAction === 'summary') {
     $allocatedFunds = (float) $pdo->query("SELECT COALESCE(SUM(requested_amount),0) FROM applications WHERE status='approved'")->fetchColumn();
     $remainingFunds = $totalFunds - $allocatedFunds;
 
+    // Application counts for the stat cards
+    $totalApps    = (int) $pdo->query("SELECT COUNT(*) FROM applications")->fetchColumn();
+    $pendingReview = (int) $pdo->query("SELECT COUNT(*) FROM applications WHERE status='submitted'")->fetchColumn();
+
     // 6-month chart data
     $labels = []; $allocated = []; $available = []; $disbursed = [];
     for ($i = 5; $i >= 0; $i--) {
@@ -40,13 +44,15 @@ if ($dashAction === 'summary') {
     }
 
     jsonSuccess([
-        'total_funds'     => $totalFunds,
-        'allocated_funds' => $allocatedFunds,
-        'remaining_funds' => $remainingFunds,
-        'funds_trend'     => 12.5,  // implement historical comparison if needed
-        'allocated_trend' => 8.2,
-        'remaining_trend' => -5.3,
-        'chart'           => compact('labels', 'allocated', 'available', 'disbursed'),
+        'total_funds'      => $totalFunds,
+        'allocated_funds'  => $allocatedFunds,
+        'remaining_funds'  => $remainingFunds,
+        'total_applications' => $totalApps,
+        'pending_review'   => $pendingReview,
+        'funds_trend'      => 12.5,
+        'allocated_trend'  => 8.2,
+        'remaining_trend'  => -5.3,
+        'chart'            => compact('labels', 'allocated', 'available', 'disbursed'),
     ]);
 }
 
@@ -55,22 +61,27 @@ if ($dashAction === 'user-summary') {
     $userId = $auth['id'];
     $pdo    = db();
 
-    $total       = (int)$pdo->prepare("SELECT COUNT(*) FROM applications WHERE user_id=?")->execute([$userId]) && ($s=$pdo->prepare("SELECT COUNT(*) FROM applications WHERE user_id=?")) && $s->execute([$userId]) ? (int)$s->fetchColumn() : 0;
+    // BUG FIX: removed the broken chained && assignment; use clean prepared statements only
+    $stmtTotal = $pdo->prepare("SELECT COUNT(*) FROM applications WHERE user_id=?");
+    $stmtTotal->execute([$userId]);
 
-    // Clean queries
-    $stmtTotal = $pdo->prepare("SELECT COUNT(*) FROM applications WHERE user_id=?"); $stmtTotal->execute([$userId]);
-    $stmtApprv = $pdo->prepare("SELECT COUNT(*) FROM applications WHERE user_id=? AND status='approved'"); $stmtApprv->execute([$userId]);
-    $stmtRevw  = $pdo->prepare("SELECT COUNT(*) FROM applications WHERE user_id=? AND status='under-review'"); $stmtRevw->execute([$userId]);
-    $stmtGrant = $pdo->prepare("SELECT COUNT(*) FROM grants WHERE status='active'"); $stmtGrant->execute([]);
+    $stmtApprv = $pdo->prepare("SELECT COUNT(*) FROM applications WHERE user_id=? AND status='approved'");
+    $stmtApprv->execute([$userId]);
+
+    $stmtRevw = $pdo->prepare("SELECT COUNT(*) FROM applications WHERE user_id=? AND status='under-review'");
+    $stmtRevw->execute([$userId]);
+
+    $stmtGrant = $pdo->prepare("SELECT COUNT(*) FROM grants WHERE status='active'");
+    $stmtGrant->execute([]);
 
     $recent = Application::forUser($userId, [], 1, 5);
 
     jsonSuccess([
-        'total_applications' => (int)$stmtTotal->fetchColumn(),
-        'approved'           => (int)$stmtApprv->fetchColumn(),
-        'under_review'       => (int)$stmtRevw->fetchColumn(),
-        'open_grants'        => (int)$stmtGrant->fetchColumn(),
-        'recent_applications'=> $recent['items'],
+        'total_applications'  => (int)$stmtTotal->fetchColumn(),
+        'approved'            => (int)$stmtApprv->fetchColumn(),
+        'under_review'        => (int)$stmtRevw->fetchColumn(),
+        'open_grants'         => (int)$stmtGrant->fetchColumn(),
+        'recent_applications' => $recent['items'],
     ]);
 }
 

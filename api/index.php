@@ -4,12 +4,7 @@
 //  Every HTTP request arrives here.
 // ─────────────────────────────────────────────────────────────
 
-// Start output buffer immediately — catches any stray whitespace
-// or PHP warnings that would corrupt the JSON response
 ob_start();
-
-// Suppress PHP notices/warnings from appearing in JSON output
-// (errors are logged to file instead)
 ini_set('display_errors', 0);
 error_reporting(E_ALL);
 ini_set('log_errors', 1);
@@ -24,7 +19,7 @@ require_once __DIR__ . '/helpers/JWT.php';
 require_once __DIR__ . '/middleware/Cors.php';
 require_once __DIR__ . '/middleware/Auth.php';
 
-// Global exception handler — returns JSON instead of HTML error page
+// Global exception handler
 set_exception_handler(function(Throwable $e) {
     ob_clean();
     http_response_code(500);
@@ -37,24 +32,17 @@ set_exception_handler(function(Throwable $e) {
     exit;
 });
 
-// Always handle CORS first
 handleCors();
 
-// Parse request
 $method  = $_SERVER['REQUEST_METHOD'];
 $rawUri  = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-
-// Strip everything up to and including /api from the path.
-// Works whether the project is at domain root (/api/...)
-// or inside a subfolder (/grant-system/api/...) or any other name.
-$uri = trim(preg_replace('#^.*?/api/?#', '', $rawUri), '/');
+$uri     = trim(preg_replace('#^.*?/api/?#', '', $rawUri), '/');
 $parts   = $uri !== '' ? explode('/', $uri) : [];
 
 $resource = $parts[0] ?? '';
-$id       = $parts[1] ?? null;   // e.g. /api/grants/5  → id = "5"
-$action   = $parts[2] ?? null;   // e.g. /api/applications/5/status → action = "status"
+$id       = $parts[1] ?? null;
+$action   = $parts[2] ?? null;
 
-// ─── ROUTE TABLE ───────────────────────────────────────────
 switch ($resource) {
 
     case 'auth':
@@ -97,6 +85,12 @@ switch ($resource) {
         require_once __DIR__ . '/controllers/SettingsController.php';
         break;
 
+    case 'roles':
+        // Legacy route — delegate to SettingsController which handles it
+        $id = 'roles';
+        require_once __DIR__ . '/controllers/SettingsController.php';
+        break;
+
     case 'dashboard':
         require_once __DIR__ . '/controllers/DashboardController.php';
         break;
@@ -105,8 +99,13 @@ switch ($resource) {
         require_once __DIR__ . '/controllers/UploadController.php';
         break;
 
+    // NEW: Audit trail endpoint
+    case 'audit':
+        require_once __DIR__ . '/controllers/AuditController.php';
+        break;
+
     case '':
-        jsonSuccess(['status' => 'Grant Management API running'], 'OK');
+        jsonSuccess(['status' => 'Grant Management API running', 'version' => '1.1.0'], 'OK');
         break;
 
     default:
