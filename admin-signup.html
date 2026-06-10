@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Admin Registration | Grant Management System</title>
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="stylesheet" href="assets/css/dark-mode.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .admin-header-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, #7c3aed, #4f46e5);
+            color: #fff;
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 5px 14px;
+            border-radius: 20px;
+            margin-bottom: 12px;
+            letter-spacing: 0.02em;
+        }
+        .admin-header-badge i { font-size: 0.75rem; }
+
+        .secret-key-group {
+            background: #faf5ff;
+            border: 1.5px solid #c4b5fd;
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+        .secret-key-group label {
+            color: #7c3aed !important;
+            font-weight: 600 !important;
+        }
+        .secret-key-group .form-hint {
+            color: #7c3aed;
+            opacity: 0.8;
+        }
+        .secret-key-group input:focus {
+            border-color: #7c3aed !important;
+            box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.12) !important;
+        }
+
+        .admin-submit-btn {
+            background: linear-gradient(135deg, #7c3aed, #4f46e5) !important;
+            color: #fff !important;
+        }
+        .admin-submit-btn:hover {
+            background: linear-gradient(135deg, #6d28d9, #4338ca) !important;
+        }
+
+        .back-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            margin-top: 16px;
+            color: var(--gray-500, #6b7280);
+            font-size: 0.88rem;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        .back-link:hover { color: var(--primary-blue, #1a56db); }
+
+        .warning-box {
+            background: #fff7ed;
+            border: 1px solid #fed7aa;
+            border-radius: 8px;
+            padding: 12px 14px;
+            margin-bottom: 20px;
+            font-size: 0.83rem;
+            color: #92400e;
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+        }
+        .warning-box i { margin-top: 2px; flex-shrink: 0; color: #f59e0b; }
+    </style>
+</head>
+<body class="auth-page">
+    <div class="auth-container">
+        <div class="auth-card auth-card-large">
+            <div class="auth-header">
+                <div class="auth-logo">
+                    <i class="fas fa-shield-alt" style="color: #7c3aed;"></i>
+                    <h1>Grant System</h1>
+                </div>
+                <div class="admin-header-badge">
+                    <i class="fas fa-lock"></i> Administrator Registration
+                </div>
+                <p class="auth-subtitle">Create an admin account to manage the grant system</p>
+            </div>
+
+            <div class="warning-box">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span>Admin accounts have full system access. You must provide the administrator secret key to register.</span>
+            </div>
+
+            <form id="adminSignupForm" class="auth-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="firstName">First Name</label>
+                        <input type="text" id="firstName" name="firstName" placeholder="John" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="lastName">Last Name</label>
+                        <input type="text" id="lastName" name="lastName" placeholder="Doe" required />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="adminEmail">Email Address</label>
+                    <input type="email" id="adminEmail" name="email" placeholder="admin@example.com" required />
+                </div>
+
+                <div class="form-group">
+                    <label for="adminPassword">Password</label>
+                    <div class="password-wrapper">
+                        <input type="password" id="adminPassword" name="password" placeholder="Create a strong password" required />
+                        <button type="button" class="password-toggle" id="adminPasswordToggle">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <small class="form-hint">At least 6 characters</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="confirmPassword">Confirm Password</label>
+                    <div class="password-wrapper">
+                        <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm your password" required />
+                        <button type="button" class="password-toggle" id="confirmPasswordToggle">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Admin Secret Key -->
+                <div class="secret-key-group">
+                    <div class="form-group" style="margin-bottom:0;">
+                        <label for="adminSecretKey"><i class="fas fa-key"></i> Admin Secret Key</label>
+                        <div class="password-wrapper">
+                            <input type="password" id="adminSecretKey" name="admin_secret" placeholder="Enter the administrator secret key" required />
+                            <button type="button" class="password-toggle" id="secretKeyToggle">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                        <small class="form-hint">Contact your system administrator for this key</small>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="agreeTerms" required />
+                        <span>I agree to the Terms of Service and Privacy Policy</span>
+                    </label>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-large admin-submit-btn" id="submitBtn">
+                    <i class="fas fa-user-shield"></i> Create Admin Account
+                </button>
+            </form>
+
+            <a href="login.html" class="back-link">
+                <i class="fas fa-arrow-left"></i> Back to Sign In
+            </a>
+
+            <div style="text-align:center; margin-top:12px;">
+                <a href="signup.html" class="link-small">Register as an Applicant instead</a>
+            </div>
+        </div>
+
+        <div class="auth-background">
+            <div class="bg-pattern"></div>
+        </div>
+    </div>
+
+    <script src="assets/js/api.js"></script>
+    <script src="assets/js/auth.js"></script>
+    <script src="assets/js/app.js"></script>
+    <script src="assets/js/dark-mode.js"></script>
+    <script>
+        // Redirect already-logged-in users
+        if (Auth.isLoggedIn()) {
+            window.location.href = Auth.isAdmin() ? 'index.html' : 'user-index.html';
+        }
+
+        document.getElementById('adminSignupForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const firstName       = document.getElementById('firstName').value.trim();
+            const lastName        = document.getElementById('lastName').value.trim();
+            const email           = document.getElementById('adminEmail').value.trim();
+            const password        = document.getElementById('adminPassword').value.trim();
+            const confirmPassword = document.getElementById('confirmPassword').value.trim();
+            const adminSecret     = document.getElementById('adminSecretKey').value.trim();
+            const agreeTerms      = document.getElementById('agreeTerms').checked;
+            const btn             = document.getElementById('submitBtn');
+
+            // Validations
+            if (!firstName || !lastName || !email || !password || !confirmPassword || !adminSecret) {
+                showAlert('Please fill in all required fields.', 'warning'); return;
+            }
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                showAlert('Please enter a valid email address.', 'warning'); return;
+            }
+            if (password.length < 6) {
+                showAlert('Password must be at least 6 characters.', 'warning'); return;
+            }
+            if (password !== confirmPassword) {
+                showAlert('Passwords do not match.', 'warning'); return;
+            }
+            if (!agreeTerms) {
+                showAlert('Please agree to the Terms of Service.', 'warning'); return;
+            }
+
+            setLoading(btn, true, 'Creating admin account...');
+            try {
+                const user = await Auth.register({
+                    first_name:   firstName,
+                    last_name:    lastName,
+                    email:        email,
+                    password:     password,
+                    role:         'admin',
+                    admin_secret: adminSecret,
+                });
+
+                if (user.role !== 'admin') {
+                    showAlert('Registration succeeded but admin role was not granted. Check your secret key.', 'error');
+                    setLoading(btn, false);
+                    return;
+                }
+
+                showAlert('Admin account created! Redirecting to dashboard...', 'success');
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1200);
+            } catch (err) {
+                showAlert(err.message || 'Registration failed. Please check your details and secret key.', 'error');
+                if (err.errors) showFieldErrors(err.errors);
+                setLoading(btn, false);
+            }
+        });
+
+        // Password toggles
+        [
+            ['adminPasswordToggle',  'adminPassword'],
+            ['confirmPasswordToggle','confirmPassword'],
+            ['secretKeyToggle',      'adminSecretKey'],
+        ].forEach(([btnId, inputId]) => {
+            document.getElementById(btnId)?.addEventListener('click', function() {
+                const input = document.getElementById(inputId);
+                const icon  = this.querySelector('i');
+                const show  = input.type === 'password';
+                input.type  = show ? 'text' : 'password';
+                icon.classList.toggle('fa-eye', !show);
+                icon.classList.toggle('fa-eye-slash', show);
+            });
+        });
+    </script>
+</body>
+</html>

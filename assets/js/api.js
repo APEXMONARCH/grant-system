@@ -15,8 +15,8 @@ const API = (() => {
   const BASE_URL = '/grant-system/api'; // ← update this to match your PHP API path
 
   // ─── TOKEN HELPERS ─────────────────────────────────────────
-  const getToken  = () => localStorage.getItem('auth_token');
-  const setToken  = (t) => localStorage.setItem('auth_token', t);
+  const getToken   = () => localStorage.getItem('auth_token');
+  const setToken   = (t) => localStorage.setItem('auth_token', t);
   const clearToken = () => {
     localStorage.removeItem('auth_token');
     localStorage.removeItem('auth_user');
@@ -45,28 +45,29 @@ const API = (() => {
       throw { message: 'Network error. Please check your connection.', networkError: true };
     }
 
+    // Always try to parse JSON first so we get the real server message
+    let json;
+    try {
+      json = await res.json();
+    } catch {
+      throw { status: res.status, message: 'Unexpected server response. Check that the API is reachable.' };
+    }
+
     // Token expired / not authenticated — bounce to login
-    if (res.status === 401) {
+    // Exception: auth endpoints (login/register) should NOT redirect on 401
+    if (res.status === 401 && !endpoint.startsWith('/auth/')) {
       clearToken();
       window.location.href = 'login.html';
       return;
     }
 
-    // Forbidden — wrong role
-    if (res.status === 403) {
-      throw { status: 403, message: 'You do not have permission to perform this action.' };
-    }
-
-    let json;
-    try {
-      json = await res.json();
-    } catch {
-      throw { status: res.status, message: 'Unexpected server response.' };
-    }
-
+    // For all error statuses, throw with the real message from the server
     if (!res.ok) {
-      // Pass through PHP validation errors and messages
-      throw { status: res.status, message: json.message || 'An error occurred.', errors: json.errors || {} };
+      throw {
+        status:  res.status,
+        message: json.message || 'An error occurred.',
+        errors:  json.errors  || {},
+      };
     }
 
     return json; // { success, data, message }
@@ -86,10 +87,10 @@ const API = (() => {
     getToken,
     setToken,
     clearToken,
-    get:    (endpoint, params)       => request('GET',    endpoint + qs(params)),
-    post:   (endpoint, data, fd)     => request('POST',   endpoint, data, fd),
-    put:    (endpoint, data)         => request('PUT',    endpoint, data),
-    patch:  (endpoint, data)         => request('PATCH',  endpoint, data),
-    delete: (endpoint)               => request('DELETE', endpoint),
+    get:    (endpoint, params)   => request('GET',    endpoint + qs(params)),
+    post:   (endpoint, data, fd) => request('POST',   endpoint, data, fd),
+    put:    (endpoint, data)     => request('PUT',    endpoint, data),
+    patch:  (endpoint, data)     => request('PATCH',  endpoint, data),
+    delete: (endpoint)           => request('DELETE', endpoint),
   };
 })();

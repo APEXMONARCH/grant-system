@@ -1,13 +1,39 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Sign Up | Grant Management System</title>
+    <title>Create Account | Grant Management System</title>
     <link rel="stylesheet" href="assets/css/styles.css">
     <link rel="stylesheet" href="assets/css/dark-mode.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .role-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #eff6ff;
+            color: var(--primary-blue, #1a56db);
+            font-size: 0.78rem;
+            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: 20px;
+            margin-bottom: 12px;
+        }
+        .admin-link-hint {
+            text-align: center;
+            margin-top: 14px;
+            font-size: 0.85rem;
+            color: var(--gray-500, #6b7280);
+        }
+        .admin-link-hint a {
+            color: #7c3aed;
+            font-weight: 500;
+            text-decoration: none;
+        }
+        .admin-link-hint a:hover { text-decoration: underline; }
+    </style>
 </head>
 <body class="auth-page">
     <div class="auth-container">
@@ -17,7 +43,10 @@
                     <i class="fas fa-hand-holding-heart"></i>
                     <h1>Grant System</h1>
                 </div>
-                <p class="auth-subtitle">Create your account to get started</p>
+                <div class="role-badge">
+                    <i class="fas fa-user"></i> Applicant Registration
+                </div>
+                <p class="auth-subtitle">Create your account to browse and apply for grants</p>
             </div>
 
             <form id="signupForm" class="auth-form">
@@ -60,7 +89,7 @@
 
                 <div class="form-group">
                     <label for="organization">Organization (Optional)</label>
-                    <input type="text" id="organization" name="organization" placeholder="Your organization name" />
+                    <input type="text" id="organization" name="organization" placeholder="Your organization or institution" />
                 </div>
 
                 <div class="form-group">
@@ -70,7 +99,9 @@
                     </label>
                 </div>
 
-                <button type="submit" class="btn btn-primary btn-large">Create Account</button>
+                <button type="submit" class="btn btn-primary btn-large" id="submitBtn">
+                    <i class="fas fa-user-plus"></i> Create Account
+                </button>
             </form>
 
             <div class="auth-divider">
@@ -78,6 +109,10 @@
             </div>
 
             <a href="login.html" class="btn btn-secondary btn-large">Sign In</a>
+
+            <div class="admin-link-hint">
+                Registering as an administrator? <a href="admin-signup.html"><i class="fas fa-shield-alt"></i> Admin Sign Up</a>
+            </div>
         </div>
 
         <div class="auth-background">
@@ -101,9 +136,9 @@
             const email           = document.getElementById('signupEmail').value.trim();
             const password        = document.getElementById('signupPassword').value.trim();
             const confirmPassword = document.getElementById('confirmPassword').value.trim();
-            const agreeTerms      = document.getElementById('agreeTerms').checked;
             const organization    = document.getElementById('organization').value.trim();
-            const btn             = this.querySelector('[type="submit"]');
+            const agreeTerms      = document.getElementById('agreeTerms').checked;
+            const btn             = document.getElementById('submitBtn');
 
             if (!firstName || !lastName || !email || !password || !confirmPassword) {
                 showAlert('Please fill in all required fields.', 'warning'); return;
@@ -123,10 +158,17 @@
 
             setLoading(btn, true, 'Creating account...');
             try {
-                const user = await Auth.register({ first_name: firstName, last_name: lastName, email, password, organization });
+                const user = await Auth.register({
+                    first_name:   firstName,
+                    last_name:    lastName,
+                    email:        email,
+                    password:     password,
+                    organization: organization,
+                    role:         'applicant',
+                });
                 showAlert('Account created! Welcome!', 'success');
                 setTimeout(() => {
-                    window.location.href = user.role === 'admin' ? 'index.html' : 'user-index.html';
+                    window.location.href = 'user-index.html';
                 }, 1000);
             } catch (err) {
                 showAlert(err.message || 'Registration failed.', 'error');
@@ -136,7 +178,7 @@
         });
 
         // Password toggles
-        ['signupPasswordToggle','confirmPasswordToggle'].forEach((btnId, i) => {
+        ['signupPasswordToggle', 'confirmPasswordToggle'].forEach((btnId, i) => {
             const inputId = i === 0 ? 'signupPassword' : 'confirmPassword';
             document.getElementById(btnId)?.addEventListener('click', function() {
                 const input = document.getElementById(inputId);
@@ -150,4 +192,3 @@
     </script>
 </body>
 </html>
-
