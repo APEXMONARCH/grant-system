@@ -10,7 +10,7 @@ require_once __DIR__ . '/../models/Application.php';
 require_once __DIR__ . '/../models/Beneficiary.php';
 
 $auth       = requireAuth();
-$dashAction = $id ?? 'summary'; // 'summary' or 'user-summary'
+$dashAction = $id ?? 'summary';
 
 if ($method !== 'GET') jsonError('Method not allowed.', 405);
 
@@ -23,9 +23,12 @@ if ($dashAction === 'summary') {
     $allocatedFunds = (float) $pdo->query("SELECT COALESCE(SUM(requested_amount),0) FROM applications WHERE status='approved'")->fetchColumn();
     $remainingFunds = $totalFunds - $allocatedFunds;
 
-    // Application counts for the stat cards
-    $totalApps    = (int) $pdo->query("SELECT COUNT(*) FROM applications")->fetchColumn();
-    $pendingReview = (int) $pdo->query("SELECT COUNT(*) FROM applications WHERE status='submitted'")->fetchColumn();
+    // Stat card counts
+    $totalAppsStmt = $pdo->query("SELECT COUNT(*) FROM applications");
+    $totalApps     = (int)$totalAppsStmt->fetchColumn();
+
+    $pendingStmt   = $pdo->query("SELECT COUNT(*) FROM applications WHERE status='submitted'");
+    $pendingReview = (int)$pendingStmt->fetchColumn();
 
     // 6-month chart data
     $labels = []; $allocated = []; $available = []; $disbursed = [];
@@ -44,15 +47,15 @@ if ($dashAction === 'summary') {
     }
 
     jsonSuccess([
-        'total_funds'      => $totalFunds,
-        'allocated_funds'  => $allocatedFunds,
-        'remaining_funds'  => $remainingFunds,
+        'total_funds'        => $totalFunds,
+        'allocated_funds'    => $allocatedFunds,
+        'remaining_funds'    => $remainingFunds,
         'total_applications' => $totalApps,
-        'pending_review'   => $pendingReview,
-        'funds_trend'      => 12.5,
-        'allocated_trend'  => 8.2,
-        'remaining_trend'  => -5.3,
-        'chart'            => compact('labels', 'allocated', 'available', 'disbursed'),
+        'pending_review'     => $pendingReview,
+        'funds_trend'        => 12.5,
+        'allocated_trend'    => 8.2,
+        'remaining_trend'    => -5.3,
+        'chart'              => compact('labels', 'allocated', 'available', 'disbursed'),
     ]);
 }
 
@@ -61,14 +64,15 @@ if ($dashAction === 'user-summary') {
     $userId = $auth['id'];
     $pdo    = db();
 
-    // BUG FIX: removed the broken chained && assignment; use clean prepared statements only
+    // BUG FIX: removed the broken chained && assignment
+    // Each query is a clean separate prepared statement
     $stmtTotal = $pdo->prepare("SELECT COUNT(*) FROM applications WHERE user_id=?");
     $stmtTotal->execute([$userId]);
 
     $stmtApprv = $pdo->prepare("SELECT COUNT(*) FROM applications WHERE user_id=? AND status='approved'");
     $stmtApprv->execute([$userId]);
 
-    $stmtRevw = $pdo->prepare("SELECT COUNT(*) FROM applications WHERE user_id=? AND status='under-review'");
+    $stmtRevw  = $pdo->prepare("SELECT COUNT(*) FROM applications WHERE user_id=? AND status='under-review'");
     $stmtRevw->execute([$userId]);
 
     $stmtGrant = $pdo->prepare("SELECT COUNT(*) FROM grants WHERE status='active'");

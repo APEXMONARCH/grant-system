@@ -1,136 +1,64 @@
-/* ═══════════════════════════════════════════════════════════════
-   DARK MODE  — append to assets/css/styles.css
-   NEW FEATURE (Instruction item 16): Dark mode support.
-   Activated by adding class="dark-mode" to <html> via dark-mode.js
-   ═══════════════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════
+   dark-mode.css — link AFTER styles.css on every page
+   <link rel="stylesheet" href="assets/css/dark-mode.css">
+   ═══════════════════════════════════════════════ */
 
 :root.dark-mode {
-  /* Backgrounds */
-  --white:      #1e2433;
-  --gray-50:    #252b3b;
-  --gray-100:   #2d3448;
-  --gray-200:   #3a4160;
-  --gray-300:   #4b5373;
-
-  /* Text */
-  --gray-500:   #94a3b8;
-  --gray-600:   #b0bcd4;
-  --gray-700:   #cbd5e1;
-  --gray-800:   #e2e8f0;
-  --gray-900:   #f1f5f9;
-
-  /* Shadows — lighter on dark bg */
-  --shadow-sm:  0 1px 3px rgba(0,0,0,.5);
-  --shadow-md:  0 4px 12px rgba(0,0,0,.5);
-  --shadow-lg:  0 8px 24px rgba(0,0,0,.6);
-  --shadow-xl:  0 16px 48px rgba(0,0,0,.7);
+  --white:    #1e2433;
+  --gray-50:  #252b3b;
+  --gray-100: #2d3448;
+  --gray-200: #3a4160;
+  --gray-300: #4b5373;
+  --gray-500: #94a3b8;
+  --gray-600: #b0bcd4;
+  --gray-700: #cbd5e1;
+  --gray-800: #e2e8f0;
+  --gray-900: #f1f5f9;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,.5);
+  --shadow-md: 0 4px 12px rgba(0,0,0,.5);
+  --shadow-lg: 0 8px 24px rgba(0,0,0,.6);
 }
 
-/* Cards */
 :root.dark-mode .card,
-:root.dark-mode .stat-card {
-  background: var(--gray-50);
-  border-color: var(--gray-200);
-}
+:root.dark-mode .stat-card            { background: var(--gray-50); border-color: var(--gray-200); }
+:root.dark-mode .topbar               { background: var(--gray-50); border-color: var(--gray-200); }
+:root.dark-mode .modal-content        { background: var(--gray-50); }
+:root.dark-mode .dropdown-menu        { background: var(--gray-50); border-color: var(--gray-200); }
+:root.dark-mode .notification-dropdown{ background: var(--gray-50); border-color: var(--gray-200); }
+:root.dark-mode .kanban-column        { background: var(--gray-100); }
+:root.dark-mode .kanban-card,
+:root.dark-mode .application-card     { background: var(--gray-50); border-color: var(--gray-200); }
 
-/* Table rows */
-:root.dark-mode .data-table tbody tr:hover {
-  background: var(--gray-100);
-}
-:root.dark-mode .data-table th {
-  background: var(--gray-100);
-  color: var(--gray-600);
-}
-:root.dark-mode .data-table td {
-  border-color: var(--gray-200);
-  color: var(--gray-700);
-}
-
-/* Sidebar stays dark — no change needed */
-
-/* Form inputs */
 :root.dark-mode .form-input,
 :root.dark-mode .form-select,
-:root.dark-mode .form-textarea {
-  background: var(--gray-100);
-  border-color: var(--gray-200);
-  color: var(--gray-800);
-}
-:root.dark-mode .form-input::placeholder,
-:root.dark-mode .form-textarea::placeholder {
-  color: var(--gray-500);
-}
+:root.dark-mode .form-textarea,
+:root.dark-mode .filter-select,
+:root.dark-mode .search-input         { background: var(--gray-100); border-color: var(--gray-200); color: var(--gray-800); }
 
-/* Topbar */
-:root.dark-mode .topbar {
-  background: var(--gray-50);
-  border-color: var(--gray-200);
-}
+:root.dark-mode .data-table th        { background: var(--gray-100); color: var(--gray-600); }
+:root.dark-mode .data-table td        { border-color: var(--gray-200); color: var(--gray-700); }
+:root.dark-mode .data-table tbody tr:hover { background: var(--gray-100); }
 
-/* Modals */
-:root.dark-mode .modal-content {
-  background: var(--gray-50);
-}
-
-/* Badges */
 :root.dark-mode .badge-info    { background: rgba(59,130,246,.2);  color: #93c5fd; }
 :root.dark-mode .badge-success { background: rgba(16,185,129,.2);  color: #6ee7b7; }
 :root.dark-mode .badge-warning { background: rgba(245,158,11,.2);  color: #fcd34d; }
 :root.dark-mode .badge-danger  { background: rgba(239,68,68,.2);   color: #fca5a5; }
 
-/* Kanban columns */
-:root.dark-mode .kanban-column {
-  background: var(--gray-100);
-}
-:root.dark-mode .kanban-card {
-  background: var(--gray-50);
-  border-color: var(--gray-200);
-}
-
-/* Notification panel */
-:root.dark-mode .notification-dropdown {
-  background: var(--gray-50);
-  border-color: var(--gray-200);
-}
-:root.dark-mode .notification-item:hover {
-  background: var(--gray-100);
-}
-
-/* Dropdown menus */
-:root.dark-mode .dropdown-menu {
-  background: var(--gray-50);
-  border-color: var(--gray-200);
-}
-:root.dark-mode .dropdown-menu a {
-  color: var(--gray-700);
-}
-:root.dark-mode .dropdown-menu a:hover {
-  background: var(--gray-100);
-}
-
-/* Charts — Chart.js picks up colours dynamically via JS,
-   but grid lines need attention */
-:root.dark-mode canvas {
-  filter: none; /* keep charts as-is; configure via chartDefaults below */
-}
-
-/* Transition for smooth switching */
-body,
-.card, .stat-card, .topbar, .form-input, .form-select,
-.form-textarea, .data-table th, .data-table td,
-.modal-content, .kanban-column, .kanban-card,
-.dropdown-menu, .notification-dropdown {
+/* Smooth transitions */
+body, .card, .stat-card, .topbar, .modal-content,
+.application-card, .kanban-column, .data-table th,
+.data-table td, .form-input, .form-select, .form-textarea {
   transition: background-color 0.25s ease, border-color 0.25s ease, color 0.15s ease;
 }
 
-/* ── Accessibility: focus ring always visible ── */
+/* Always-visible focus rings for accessibility */
 *:focus-visible {
   outline: 3px solid var(--primary-blue);
   outline-offset: 2px;
   border-radius: 4px;
 }
 
-/* ── Accessibility: reduce motion ── */
+/* Respect reduce-motion preference */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;

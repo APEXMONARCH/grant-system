@@ -1,81 +1,66 @@
 /**
- * apply-ai-patch.js — Patches user-apply-grant to use AI Check on step 6
- *
- * Include AFTER user-dashboard.js and ai-check.js on user-apply-grant.html:
+ * apply-ai-patch.js
+ * Include on user-apply-grant.html AFTER ai-check.js:
  *   <script src="assets/js/ai-check.js"></script>
  *   <script src="assets/js/apply-ai-patch.js"></script>
  *
- * This file is intentionally separate so the core user-dashboard.js
- * doesn't need to be modified — it hooks in via event listeners.
+ * Injects the AI check panel and intercepts the submit button
+ * so the AI runs first before the form posts.
  */
 
 document.addEventListener('DOMContentLoaded', () => {
-  injectAiCheckPanel();
-  patchSubmitButton();
+  injectAiPanel();
+  patchSubmit();
 });
 
-function injectAiCheckPanel() {
-  // Insert the AI check panel just before the form action buttons in step 6
-  const step6 = document.querySelector('[data-step="6"]');
-  if (!step6) return;
-
-  const actionsDiv = document.querySelector('.apply-form-actions');
+function injectAiPanel() {
+  const actionsDiv = document.querySelector('.apply-form-actions') || document.querySelector('[class*="form-actions"]');
   if (!actionsDiv) return;
-
   const panel = document.createElement('div');
   panel.id    = 'aiCheckPanel';
   panel.style.display = 'none';
+  panel.style.marginBottom = '16px';
   actionsDiv.parentNode.insertBefore(panel, actionsDiv);
 }
 
-function patchSubmitButton() {
-  const submitBtn = document.getElementById('submitApplicationBtn');
-  if (!submitBtn) return;
+function patchSubmit() {
+  const btn = document.getElementById('submitApplicationBtn');
+  if (!btn) return;
 
-  // Intercept the submit click to run AI check first
-  submitBtn.addEventListener('click', async (e) => {
+  btn.addEventListener('click', async (e) => {
     e.preventDefault();
     e.stopImmediatePropagation();
 
-    // Gather form fields for AI check
     const formData = {
-      grant_id:         document.getElementById('selectedGrantId')?.value  || '',
-      full_name:        document.getElementById('fullName')?.value         || '',
-      email:            document.getElementById('applicantEmail')?.value   || '',
-      research_title:   document.getElementById('researchTitle')?.value    || '',
-      objectives:       document.getElementById('objectives')?.value       || '',
-      methodology:      document.getElementById('methodology')?.value      || '',
-      digital_signature:document.getElementById('digitalSignature')?.value || '',
-      budget_items:     collectBudgetItems(),
+      grant_id:          document.getElementById('selectedGrantId')?.value || document.querySelector('[name="grant_id"]')?.value || '',
+      full_name:         document.getElementById('appFullName')?.value     || document.querySelector('[name="full_name"]')?.value || '',
+      email:             document.getElementById('appEmail')?.value        || document.querySelector('[name="email"]')?.value || '',
+      research_title:    document.getElementById('researchTitle')?.value   || '',
+      objectives:        document.getElementById('objectives')?.value      || '',
+      methodology:       document.getElementById('methodology')?.value     || '',
+      digital_signature: document.getElementById('digitalSignature')?.value || document.querySelector('[name="digital_signature"]')?.value || '',
+      budget_items:      collectBudget(),
     };
 
-    const panel = document.getElementById('aiCheckPanel');
-    if (panel) panel.style.display = 'block';
-
-    // Scroll to panel so user sees the result
-    panel?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-
     const ok = await AiCheck.run(formData);
-
     if (ok) {
-      // Re-trigger the original form submission handler
-      const form = submitBtn.closest('form');
-      if (form) {
-        const customEvent = new CustomEvent('aicheck:passed', { bubbles: true });
-        form.dispatchEvent(customEvent);
+      // Dispatch a custom event so the original submit handler can proceed
+      btn.dispatchEvent(new CustomEvent('aicheck:passed', { bubbles: true }));
+      // Also directly call submitApplication if it exists in scope
+      if (typeof submitApplication === 'function') {
+        submitApplication(new Event('submit'));
       }
     }
-  }, true); // capture phase so it runs before existing listeners
+  }, true);
 }
 
-function collectBudgetItems() {
-  const rows = document.querySelectorAll('.budget-row');
+function collectBudget() {
   const items = [];
-  rows.forEach(row => {
-    const item = row.querySelector('[name="budgetItem"]')?.value        || '';
-    const desc = row.querySelector('[name="budgetDescription"]')?.value || '';
-    const cost = row.querySelector('[name="budgetCost"]')?.value        || 0;
-    if (item) items.push({ item, description: desc, cost: parseFloat(cost) || 0 });
+  document.querySelectorAll('.budget-row, [data-budget-row]').forEach(row => {
+    const item = row.querySelector('[name="budgetItem"], .budget-item')?.value || '';
+    const desc = row.querySelector('[name="budgetDescription"], .budget-desc')?.value || '';
+    const cost = parseFloat(row.querySelector('[name="budgetCost"], .budget-cost')?.value || 0);
+    if (item) items.push({ item, description: desc, cost });
   });
   return items;
 }

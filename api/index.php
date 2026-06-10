@@ -1,7 +1,6 @@
 <?php
 // ─────────────────────────────────────────────────────────────
 //  api/index.php  — Main router
-//  Every HTTP request arrives here.
 // ─────────────────────────────────────────────────────────────
 
 ob_start();
@@ -9,7 +8,6 @@ ini_set('display_errors', 0);
 error_reporting(E_ALL);
 ini_set('log_errors', 1);
 
-// Bootstrap
 require_once __DIR__ . '/config/constants.php';
 require_once __DIR__ . '/config/database.php';
 require_once __DIR__ . '/helpers/Response.php';
@@ -19,7 +17,6 @@ require_once __DIR__ . '/helpers/JWT.php';
 require_once __DIR__ . '/middleware/Cors.php';
 require_once __DIR__ . '/middleware/Auth.php';
 
-// Global exception handler
 set_exception_handler(function(Throwable $e) {
     ob_clean();
     http_response_code(500);
@@ -34,10 +31,10 @@ set_exception_handler(function(Throwable $e) {
 
 handleCors();
 
-$method  = $_SERVER['REQUEST_METHOD'];
-$rawUri  = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-$uri     = trim(preg_replace('#^.*?/api/?#', '', $rawUri), '/');
-$parts   = $uri !== '' ? explode('/', $uri) : [];
+$method   = $_SERVER['REQUEST_METHOD'];
+$rawUri   = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+$uri      = trim(preg_replace('#^.*?/api/?#', '', $rawUri), '/');
+$parts    = $uri !== '' ? explode('/', $uri) : [];
 
 $resource = $parts[0] ?? '';
 $id       = $parts[1] ?? null;
@@ -86,7 +83,9 @@ switch ($resource) {
         break;
 
     case 'roles':
-        // Legacy route — delegate to SettingsController which handles it
+        // BUG FIX: /api/roles must set $id = 'roles' so SettingsController
+        // can handle it with the $settingKey check (since $resource is not
+        // in scope inside controller files).
         $id = 'roles';
         require_once __DIR__ . '/controllers/SettingsController.php';
         break;
@@ -99,7 +98,6 @@ switch ($resource) {
         require_once __DIR__ . '/controllers/UploadController.php';
         break;
 
-    // NEW: Audit trail endpoint
     case 'audit':
         require_once __DIR__ . '/controllers/AuditController.php';
         break;
