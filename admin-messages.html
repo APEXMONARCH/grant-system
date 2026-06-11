@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Messages | Grant Management System</title>
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="stylesheet" href="assets/css/dark-mode.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .msg-layout { display: grid; grid-template-columns: 340px 1fr; gap: 1.25rem; height: calc(100vh - 180px); min-height: 500px; }
+        .msg-sidebar { background: #fff; border-radius: 12px; border: 1px solid #e5e7eb; display: flex; flex-direction: column; overflow: hidden; }
+        .msg-sidebar-header { padding: .85rem 1rem; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center; gap:.5rem; background: #f9fafb; }
+        .msg-sidebar-header h3 { margin: 0; font-size: .95rem; font-weight: 600; }
+        .msg-search { padding: .6rem 1rem; border-bottom: 1px solid #f0f0f0; }
+        .msg-search input { width: 100%; border: 1px solid #e5e7eb; border-radius: 8px; padding: .45rem .8rem; font-size: .85rem; outline: none; }
+        .msg-list { flex: 1; overflow-y: auto; }
+        .msg-item { padding: .85rem 1rem; border-bottom: 1px solid #f3f4f6; cursor: pointer; transition: background .15s; }
+        .msg-item:hover { background: #f9fafb; }
+        .msg-item.active { background: #eff6ff; border-left: 3px solid #1a56db; }
+        .msg-item-header { display: flex; justify-content: space-between; align-items: flex-start; gap:.5rem; }
+        .msg-item-name { font-weight: 600; font-size: .88rem; color: #111827; }
+        .msg-item-time { font-size: .75rem; color: #9ca3af; white-space: nowrap; }
+        .msg-item-subject { font-size: .82rem; color: #374151; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .msg-item-preview { font-size: .78rem; color: #6b7280; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .unread-dot { width: 8px; height: 8px; background: #1a56db; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
+
+        .msg-main { background: #fff; border-radius: 12px; border: 1px solid #e5e7eb; display: flex; flex-direction: column; overflow: hidden; }
+        .msg-main-header { padding: .85rem 1.25rem; border-bottom: 1px solid #e5e7eb; background: #f9fafb; }
+        .msg-main-header h3 { margin: 0; font-size: 1rem; font-weight: 600; color: #111827; }
+        .msg-main-header .sub { font-size: .82rem; color: #6b7280; margin-top: 2px; }
+        .msg-thread { flex: 1; overflow-y: auto; padding: 1rem; display: flex; flex-direction: column; gap: .85rem; }
+        .msg-bubble { max-width: 75%; padding: .75rem 1rem; border-radius: 12px; font-size: .88rem; line-height: 1.55; }
+        .msg-bubble.from-admin { background: #eff6ff; border: 1px solid #bfdbfe; align-self: flex-start; }
+        .msg-bubble.from-user  { background: #f0fdf4; border: 1px solid #bbf7d0; align-self: flex-end; }
+        .msg-bubble .bubble-meta { font-size: .73rem; color: #6b7280; margin-top: .35rem; }
+        .msg-empty { text-align: center; color: #9ca3af; padding: 3rem 1rem; flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .5rem; }
+        .msg-empty i { font-size: 2.5rem; color: #d1d5db; }
+
+        .msg-reply-bar { padding: .85rem 1rem; border-top: 1px solid #e5e7eb; display: flex; gap: .6rem; align-items: flex-end; }
+        .msg-reply-bar textarea { flex: 1; border: 1px solid #e5e7eb; border-radius: 8px; padding: .55rem .8rem; font-size: .87rem; resize: none; outline: none; font-family: inherit; min-height: 56px; max-height: 140px; }
+        .msg-reply-bar textarea:focus { border-color: #1a56db; box-shadow: 0 0 0 2px rgba(26,86,219,.12); }
+
+        .compose-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 1rem; }
+        .compose-modal { background: #fff; border-radius: 14px; width: 100%; max-width: 540px; box-shadow: 0 20px 60px rgba(0,0,0,.25); overflow: hidden; }
+        .compose-modal-header { padding: 1rem 1.25rem; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center; }
+        .compose-modal-header h3 { margin: 0; font-size: 1rem; font-weight: 600; }
+        .compose-modal-body { padding: 1.25rem; display: flex; flex-direction: column; gap: .9rem; }
+        .compose-modal-footer { padding: .85rem 1.25rem; border-top: 1px solid #e5e7eb; display: flex; justify-content: flex-end; gap: .6rem; }
+        .compose-modal label { font-size: .85rem; font-weight: 500; color: #374151; margin-bottom: 4px; display: block; }
+        .compose-modal select, .compose-modal input, .compose-modal textarea {
+            width: 100%; border: 1px solid #e5e7eb; border-radius: 8px; padding: .5rem .8rem; font-size: .87rem; outline: none; font-family: inherit;
+        }
+        .compose-modal textarea { min-height: 110px; resize: vertical; }
+        .compose-modal select:focus, .compose-modal input:focus, .compose-modal textarea:focus { border-color: #1a56db; box-shadow: 0 0 0 2px rgba(26,86,219,.12); }
+
+        @media (max-width: 768px) {
+            .msg-layout { grid-template-columns: 1fr; height: auto; }
+            .msg-sidebar { height: 300px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-hand-holding-heart"></i>
+                    <span>Grant Management System</span>
+                </div>
+                <button class="sidebar-toggle" id="sidebarToggle"><i class="fas fa-bars"></i></button>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="index.html" class="nav-item"><i class="fas fa-tachometer-alt"></i><span>Dashboard</span></a>
+                <a href="grants.html" class="nav-item"><i class="fas fa-file-alt"></i><span>Grants</span></a>
+                <a href="applications.html" class="nav-item"><i class="fas fa-clipboard-list"></i><span>Applications</span></a>
+                <a href="beneficiaries.html" class="nav-item"><i class="fas fa-users"></i><span>Beneficiaries</span></a>
+                <a href="reports.html" class="nav-item"><i class="fas fa-chart-line"></i><span>Reports</span></a>
+                <a href="admin-messages.html" class="nav-item active"><i class="fas fa-envelope"></i><span>Messages</span></a>
+                <a href="settings.html" class="nav-item"><i class="fas fa-cog"></i><span>Settings</span></a>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="user-info-mini" id="adminMiniName"><i class="fas fa-user-circle"></i><span>Admin</span></div>
+            </div>
+        </aside>
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+        <main class="main-content">
+            <header class="topbar">
+                <button class="mobile-menu-btn" id="mobileMenuBtn"><i class="fas fa-bars"></i></button>
+                <h1 class="page-title">Messages</h1>
+                <div class="topbar-actions">
+                    <button class="btn btn-primary" id="composeBtn" style="display:flex;align-items:center;gap:.4rem;padding:.5rem 1rem;font-size:.875rem;">
+                        <i class="fas fa-plus"></i> New Message
+                    </button>
+                    <button class="icon-btn" id="notificationBtn"><i class="fas fa-bell"></i><span class="badge" id="topNotifCount">0</span></button>
+                    <div class="profile-dropdown">
+                        <button class="profile-btn" id="profileBtn">
+                            <img class="avatar" id="adminAvatar" src="https://ui-avatars.com/api/?name=Admin&background=1a56db&color=fff" alt="Profile">
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="dropdown-menu" id="profileDropdown">
+                            <a href="#"><i class="fas fa-user"></i> Profile</a>
+                            <a href="settings.html"><i class="fas fa-cog"></i> Settings</a>
+                            <hr>
+                            <a href="login.html" onclick="handleLogout(event)"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="content-wrapper" style="padding-bottom:0;">
+                <div class="msg-layout">
+                    <!-- Thread List -->
+                    <div class="msg-sidebar">
+                        <div class="msg-sidebar-header">
+                            <h3>Conversations</h3>
+                            <span id="threadCount" style="font-size:.78rem;color:#6b7280;"></span>
+                        </div>
+                        <div class="msg-search">
+                            <input type="text" id="msgSearch" placeholder="Search messages…" />
+                        </div>
+                        <div class="msg-list" id="msgList">
+                            <div style="text-align:center;padding:2rem;color:#9ca3af;font-size:.85rem;">Loading…</div>
+                        </div>
+                    </div>
+
+                    <!-- Thread Detail -->
+                    <div class="msg-main" id="msgMain">
+                        <div class="msg-empty" id="msgEmpty">
+                            <i class="fas fa-inbox"></i>
+                            <p style="font-weight:600;color:#374151;">Select a conversation</p>
+                            <p style="font-size:.85rem;">Pick a thread on the left or compose a new message.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Compose Modal -->
+    <div class="compose-overlay" id="composeOverlay" style="display:none;">
+        <div class="compose-modal">
+            <div class="compose-modal-header">
+                <h3><i class="fas fa-pen" style="margin-right:6px;color:#1a56db;"></i>New Message</h3>
+                <button id="closeCompose" style="background:none;border:none;font-size:1.1rem;cursor:pointer;color:#6b7280;"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="compose-modal-body">
+                <div>
+                    <label for="composeUser">Send To (Applicant)</label>
+                    <select id="composeUser">
+                        <option value="">— Loading users… —</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="composeSubject">Subject</label>
+                    <input type="text" id="composeSubject" placeholder="e.g. Application Update" />
+                </div>
+                <div>
+                    <label for="composeBody">Message</label>
+                    <textarea id="composeBody" placeholder="Write your message here…"></textarea>
+                </div>
+            </div>
+            <div class="compose-modal-footer">
+                <button class="btn btn-secondary" id="cancelCompose">Cancel</button>
+                <button class="btn btn-primary" id="sendCompose">
+                    <i class="fas fa-paper-plane" style="margin-right:5px;"></i>Send
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="assets/js/api.js"></script>
+    <script src="assets/js/auth.js"></script>
+    <script src="assets/js/app.js"></script>
+    <script src="assets/js/dark-mode.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        if (!Auth.requireAdmin()) return;
+
+        const user = Auth.getUser();
+        if (user) {
+            const name = `${user.first_name || ''} ${user.last_name || ''}`.trim();
+            const el = document.getElementById('adminMiniName');
+            if (el) el.innerHTML = `<i class="fas fa-user-circle"></i><span>${name}</span>`;
+            const av = document.getElementById('adminAvatar');
+            if (av) av.src = user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=1a56db&color=fff`;
+        }
+
+        loadThreads();
+        loadUsers();
+
+        // Search
+        let searchTimer;
+        document.getElementById('msgSearch').addEventListener('input', function() {
+            clearTimeout(searchTimer);
+            searchTimer = setTimeout(() => loadThreads(this.value), 350);
+        });
+
+        // Compose modal
+        document.getElementById('composeBtn').addEventListener('click', () => {
+            document.getElementById('composeOverlay').style.display = 'flex';
+        });
+        document.getElementById('closeCompose').addEventListener('click', closeCompose);
+        document.getElementById('cancelCompose').addEventListener('click', closeCompose);
+        document.getElementById('composeOverlay').addEventListener('click', function(e) {
+            if (e.target === this) closeCompose();
+        });
+        document.getElementById('sendCompose').addEventListener('click', sendNewMessage);
+    });
+
+    let allUsers = [];
+    let activeThreadId = null;
+
+    function closeCompose() {
+        document.getElementById('composeOverlay').style.display = 'none';
+        document.getElementById('composeSubject').value = '';
+        document.getElementById('composeBody').value = '';
+    }
+
+    async function loadUsers() {
+        try {
+            const res = await API.get('/users?limit=200');
+            allUsers = (res.data?.items || res.data || []).filter(u => u.role === 'applicant');
+            const sel = document.getElementById('composeUser');
+            sel.innerHTML = allUsers.length
+                ? ['<option value="">— Select a user —</option>',
+                   ...allUsers.map(u => `<option value="${u.id}">${u.first_name} ${u.last_name} &lt;${u.email}&gt;</option>`)
+                  ].join('')
+                : '<option value="">No applicants found</option>';
+        } catch(e) {
+            console.error('Failed to load users', e);
+        }
+    }
+
+    async function loadThreads(q = '') {
+        try {
+            const res = await API.get('/messages' + (q ? `?q=${encodeURIComponent(q)}` : ''));
+            const items = res.data?.items || [];
+            const list = document.getElementById('msgList');
+            document.getElementById('threadCount').textContent = `${items.length} thread${items.length !== 1 ? 's' : ''}`;
+
+            if (!items.length) {
+                list.innerHTML = '<div style="text-align:center;padding:2rem;color:#9ca3af;font-size:.85rem;">No messages yet.</div>';
+                return;
+            }
+
+            list.innerHTML = items.map(m => `
+                <div class="msg-item${m.id === activeThreadId ? ' active' : ''}" data-id="${m.id}" onclick="openThread(${m.id}, '${escH(m.subject)}', '${escH(m.user_first_name)} ${escH(m.user_last_name)}')">
+                    <div class="msg-item-header">
+                        <span class="msg-item-name">${escH(m.user_first_name)} ${escH(m.user_last_name)}</span>
+                        <span class="msg-item-time">${timeAgo(m.created_at)}</span>
+                    </div>
+                    <div class="msg-item-subject">${escH(m.subject || '(no subject)')}</div>
+                    <div class="msg-item-preview">${escH((m.message || '').substring(0, 60))}…</div>
+                    ${m.unread_replies > 0 ? `<div style="margin-top:4px;"><span style="font-size:.72rem;background:#ef4444;color:#fff;border-radius:9px;padding:1px 7px;">${m.unread_replies} new repl${m.unread_replies>1?'ies':'y'}</span></div>` : ''}
+                </div>
+            `).join('');
+        } catch(e) {
+            document.getElementById('msgList').innerHTML = '<div style="padding:1rem;color:#ef4444;font-size:.85rem;">Failed to load messages.</div>';
+        }
+    }
+
+    async function openThread(threadId, subject, userName) {
+        activeThreadId = threadId;
+
+        // Highlight active item
+        document.querySelectorAll('.msg-item').forEach(el => {
+            el.classList.toggle('active', parseInt(el.dataset.id) === threadId);
+        });
+
+        const main = document.getElementById('msgMain');
+        main.innerHTML = `
+            <div class="msg-main-header">
+                <h3>${escH(subject)}</h3>
+                <div class="sub">Conversation with <strong>${escH(userName)}</strong></div>
+            </div>
+            <div class="msg-thread" id="threadBody"><div style="text-align:center;padding:2rem;color:#9ca3af;">Loading…</div></div>
+            <div class="msg-reply-bar">
+                <textarea id="replyBox" placeholder="Type a reply…" rows="2"></textarea>
+                <button class="btn btn-primary" id="sendReplyBtn" onclick="sendAdminReply(${threadId})" style="padding:.55rem 1rem;font-size:.85rem;white-space:nowrap;">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        `;
+
+        document.getElementById('replyBox').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) sendAdminReply(threadId);
+        });
+
+        try {
+            const res = await API.get(`/messages/${threadId}/thread`);
+            const items = res.data?.items || [];
+            const body = document.getElementById('threadBody');
+            if (!items.length) {
+                body.innerHTML = '<div style="text-align:center;padding:2rem;color:#9ca3af;font-size:.85rem;">No messages in this thread.</div>';
+                return;
+            }
+            body.innerHTML = items.map(m => {
+                const isAdmin = m.sender_role === 'admin' || m.sender_role === 'system';
+                return `<div class="msg-bubble ${isAdmin ? 'from-admin' : 'from-user'}">
+                    <div>${escH(m.message)}</div>
+                    <div class="bubble-meta">${escH(m.sender)} · ${formatDate(m.created_at)}</div>
+                </div>`;
+            }).join('');
+            body.scrollTop = body.scrollHeight;
+        } catch(e) {
+            document.getElementById('threadBody').innerHTML = '<div style="padding:1rem;color:#ef4444;font-size:.85rem;">Failed to load thread.</div>';
+        }
+    }
+
+    async function sendAdminReply(threadId) {
+        const box = document.getElementById('replyBox');
+        const msg = box.value.trim();
+        if (!msg) return;
+        const btn = document.getElementById('sendReplyBtn');
+        btn.disabled = true;
+        try {
+            await API.post('/messages', { thread_id: threadId, message: msg });
+            box.value = '';
+            await openThread(threadId, '', ''); // reload thread
+            loadThreads();
+        } catch(e) {
+            showAlert(e.message || 'Failed to send reply.', 'error');
+        }
+        btn.disabled = false;
+    }
+
+    async function sendNewMessage() {
+        const userId  = document.getElementById('composeUser').value;
+        const subject = document.getElementById('composeSubject').value.trim();
+        const body    = document.getElementById('composeBody').value.trim();
+        if (!userId)  { showAlert('Please select a recipient.', 'warning'); return; }
+        if (!body)    { showAlert('Message cannot be empty.', 'warning'); return; }
+        const btn = document.getElementById('sendCompose');
+        btn.disabled = true; btn.textContent = 'Sending…';
+        try {
+            await API.post('/messages', { user_id: parseInt(userId), subject: subject || 'Message from Admin', message: body });
+            showAlert('Message sent!', 'success');
+            closeCompose();
+            loadThreads();
+        } catch(e) {
+            showAlert(e.message || 'Failed to send.', 'error');
+        }
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-paper-plane" style="margin-right:5px;"></i>Send';
+    }
+
+    function escH(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+    function timeAgo(dateStr) {
+        const d = new Date(dateStr), now = new Date();
+        const diff = Math.floor((now - d) / 60000);
+        if (diff < 1) return 'just now';
+        if (diff < 60) return diff + 'm ago';
+        if (diff < 1440) return Math.floor(diff/60) + 'h ago';
+        return Math.floor(diff/1440) + 'd ago';
+    }
+    function formatDate(dateStr) {
+        return new Date(dateStr).toLocaleString('en-GB', { day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' });
+    }
+    </script>
+</body>
+</html>

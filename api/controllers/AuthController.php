@@ -1,24 +1,18 @@
 <?php
 // ─────────────────────────────────────────────────────────────
-//  controllers/AuthController.php
+//  controllers/AuthController.php  (FIXED v2)
 //
 //  POST /api/auth/login
-//  POST /api/auth/register
+//  POST /api/auth/register           (applicant registration)
+//  POST /api/auth/register-admin     (admin registration — requires secret key)
 //  POST /api/auth/logout
 // ─────────────────────────────────────────────────────────────
 
 require_once __DIR__ . '/../models/User.php';
 require_once __DIR__ . '/../models/Notification.php';
 
-// ── Admin secret key ─────────────────────────────────────────
-// Set this in constants.php as: define('ADMIN_SECRET', 'your-secret-key');
-// If not defined, falls back to this default (change it!).
-if (!defined('ADMIN_SECRET')) {
-    define('ADMIN_SECRET', 'GrantAdmin@2025');
-}
-
 // Route: /api/auth/{action}
-$authAction = $parts[1] ?? '';   // login | register | logout
+$authAction = $parts[1] ?? '';   // login | register | register-admin | logout
 
 switch ($method . ':' . $authAction) {
 
@@ -50,7 +44,7 @@ switch ($method . ':' . $authAction) {
         ], 'Login successful.');
         break;
 
-    // ── POST /api/auth/register ─────────────────────────────
+    // ── POST /api/auth/register  (applicant) ───────────────
     case 'POST:register':
         $body = jsonBody();
 
@@ -62,43 +56,14 @@ switch ($method . ':' . $authAction) {
         ]);
         if ($errors) jsonError('Validation failed.', 422, $errors);
 
-        // ── Role assignment ──────────────────────────────────
-        // Determine the requested role (defaults to applicant for safety)
-        $requestedRole = strtolower(trim($body['role'] ?? 'applicant'));
-
-        // Only 'admin', 'reviewer', 'applicant' are valid
-        if (!in_array($requestedRole, ['admin', 'reviewer', 'applicant'], true)) {
-            $requestedRole = 'applicant';
-        }
-
-        // If requesting admin role, validate the secret key
-        if ($requestedRole === 'admin') {
-            $providedSecret = trim($body['admin_secret'] ?? '');
-            if (empty($providedSecret)) {
-                jsonError('Admin secret key is required to register as an administrator.', 403, [
-                    'admin_secret' => ['Admin secret key is required.'],
-                ]);
-            }
-            if (!hash_equals(ADMIN_SECRET, $providedSecret)) {
-                jsonError('Invalid admin secret key. Please contact your system administrator.', 403, [
-                    'admin_secret' => ['The secret key you entered is incorrect.'],
-                ]);
-            }
-        }
-
-        // Set the role in body for User::create
-        $body['role'] = $requestedRole;
+        // Force applicant role — public registration never creates admins
+        $body['role'] = 'applicant';
 
         $id    = User::create($body);
         $user  = User::findById($id);
         $token = JWT::encode(User::tokenPayload($user));
 
-        // Auto-create welcome notification
-        if ($requestedRole === 'admin') {
-            Notification::create($id, 'Welcome, Administrator!', 'Your admin account has been created. You have full access to the Grant Management System.');
-        } else {
-            Notification::create($id, 'Welcome!', 'Your account has been created successfully. Start by browsing available grants.');
-        }
+        Notification::create($id, 'Welcome!', 'Your account has been created successfully. Start by browsing available grants.');
 
         jsonSuccess([
             'token' => $token,
@@ -106,11 +71,44 @@ switch ($method . ':' . $authAction) {
         ], 'Account created successfully.', 201);
         break;
 
+    // ── POST /api/auth/register-admin  ─────────────────────
+    // Protected by a secret key defined in constants.php
+    // The frontend admin-signup.html sends:
+    //   { first_name, last_name, email, password, admin_secret }
+    case 'POST:register-admin':
+        $body = jsonBody();
+
+        // Validate secret key first
+        $adminSecret = defined('ADMIN_REGISTRATION_SECRET') ? ADMIN_REGISTRATION_SECRET : '';
+        if (empty($adminSecret) || ($body['admin_secret'] ?? '') !== $adminSecret) {
+            jsonError('Invalid admin registration key.', 403);
+        }
+
+        $errors = validate($body, [
+            'first_name' => 'required|max:100',
+            'last_name'  => 'required|max:100',
+            'email'      => 'required|email|unique:users,email',
+            'password'   => 'required|min:8',
+        ]);
+        if ($errors) jsonError('Validation failed.', 422, $errors);
+
+        $body['role'] = 'admin';
+
+        $id    = User::create($body);
+        $user  = User::findById($id);
+        $token = JWT::encode(User::tokenPayload($user));
+
+        Notification::create($id, 'Admin Account Created', 'Your admin account has been created. You have full system access.');
+
+        jsonSuccess([
+            'token' => $token,
+            'user'  => User::safe($user),
+        ], 'Admin account created successfully.', 201);
+        break;
+
     // ── POST /api/auth/logout ───────────────────────────────
     case 'POST:logout':
-        requireAuth(); // Validate token exists
-        // Stateless JWT — client discards token.
-        // Add a token blocklist here if you need server-side invalidation.
+        requireAuth();
         jsonSuccess([], 'Logged out successfully.');
         break;
 

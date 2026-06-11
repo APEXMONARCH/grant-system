@@ -8,107 +8,6 @@
     <link rel="stylesheet" href="assets/css/dark-mode.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        .role-tabs {
-            display: flex;
-            background: var(--gray-100, #f3f4f6);
-            border-radius: 10px;
-            padding: 4px;
-            margin-bottom: 24px;
-            gap: 4px;
-        }
-        .role-tab {
-            flex: 1;
-            padding: 10px 16px;
-            border: none;
-            border-radius: 7px;
-            background: transparent;
-            color: var(--gray-500, #6b7280);
-            font-size: 0.9rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            font-family: inherit;
-        }
-        .role-tab.active {
-            background: #fff;
-            color: var(--primary-blue, #1a56db);
-            box-shadow: 0 1px 4px rgba(0,0,0,0.12);
-        }
-        .role-tab.active.admin-tab {
-            color: #7c3aed;
-        }
-        .role-tab i {
-            font-size: 0.85rem;
-        }
-        .admin-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            background: #ede9fe;
-            color: #7c3aed;
-            font-size: 0.75rem;
-            font-weight: 600;
-            padding: 3px 10px;
-            border-radius: 20px;
-            margin-bottom: 16px;
-        }
-        .divider-row {
-            display: flex;
-            gap: 12px;
-            align-items: center;
-            margin: 20px 0 16px;
-        }
-        .divider-row hr {
-            flex: 1;
-            border: none;
-            border-top: 1px solid var(--gray-200, #e5e7eb);
-        }
-        .divider-row span {
-            font-size: 0.82rem;
-            color: var(--gray-400, #9ca3af);
-            white-space: nowrap;
-        }
-        .signup-links {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        .signup-link-btn {
-            width: 100%;
-            padding: 12px 16px;
-            border-radius: var(--radius-sm, 8px);
-            font-size: 0.95rem;
-            font-weight: 500;
-            text-decoration: none;
-            text-align: center;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            transition: all 0.2s ease;
-            border: 1.5px solid var(--gray-200, #e5e7eb);
-            color: var(--gray-700, #374151);
-            background: #fff;
-        }
-        .signup-link-btn:hover {
-            border-color: var(--primary-blue, #1a56db);
-            color: var(--primary-blue, #1a56db);
-            background: #eff6ff;
-        }
-        .signup-link-btn.admin-link:hover {
-            border-color: #7c3aed;
-            color: #7c3aed;
-            background: #ede9fe;
-        }
-        .signup-link-btn i {
-            font-size: 0.9rem;
-        }
-    </style>
 </head>
 <body class="auth-page">
     <div class="auth-container">
@@ -118,22 +17,7 @@
                     <i class="fas fa-hand-holding-heart"></i>
                     <h1>Grant System</h1>
                 </div>
-                <p class="auth-subtitle">Welcome back! Please sign in to your account</p>
-            </div>
-
-            <!-- Role Tabs -->
-            <div class="role-tabs">
-                <button class="role-tab active" id="tabUser" onclick="switchTab('user')">
-                    <i class="fas fa-user"></i> Applicant / User
-                </button>
-                <button class="role-tab admin-tab" id="tabAdmin" onclick="switchTab('admin')">
-                    <i class="fas fa-shield-alt"></i> Administrator
-                </button>
-            </div>
-
-            <!-- Admin badge (shown only on admin tab) -->
-            <div class="admin-badge" id="adminBadge" style="display:none;">
-                <i class="fas fa-lock"></i> Admin Portal Access
+                <p class="auth-subtitle">Welcome back! Please login to your account</p>
             </div>
 
             <form id="loginForm" class="auth-form">
@@ -159,26 +43,19 @@
                     </label>
                 </div>
 
-                <button type="submit" class="btn btn-primary btn-large" id="loginBtn">
-                    <i class="fas fa-sign-in-alt"></i> Sign In
-                </button>
+                <button type="submit" class="btn btn-primary btn-large">Login</button>
             </form>
 
-            <div class="divider-row">
-                <hr><span>Don't have an account?</span><hr>
+            <div class="auth-divider">
+                <span>Don't have an account?</span>
             </div>
 
-            <div class="signup-links">
-                <a href="signup.html" class="signup-link-btn" id="userSignupLink">
-                    <i class="fas fa-user-plus"></i> Create Applicant Account
-                </a>
-                <a href="admin-signup.html" class="signup-link-btn admin-link" id="adminSignupLink">
-                    <i class="fas fa-user-shield"></i> Register as Administrator
-                </a>
-            </div>
+            <a href="signup.html" class="btn btn-secondary btn-large">Create Applicant Account</a>
 
-            <div class="auth-footer" style="margin-top: 16px;">
+            <div class="auth-footer">
                 <a href="#" class="link-small">Forgot Password?</a>
+                &nbsp;·&nbsp;
+                <a href="admin-signup.html" class="link-small" style="color:#6b7280;">Admin Registration</a>
             </div>
         </div>
 
@@ -190,54 +67,23 @@
     <script src="assets/js/api.js"></script>
     <script src="assets/js/auth.js"></script>
     <script src="assets/js/app.js"></script>
-    <script src="assets/js/dark-mode.js"></script>
     <script>
         // Redirect already-logged-in users
         if (Auth.isLoggedIn()) {
             window.location.href = Auth.isAdmin() ? 'index.html' : 'user-index.html';
         }
 
-        let currentTab = 'user';
-
-        function switchTab(tab) {
-            currentTab = tab;
-            document.getElementById('tabUser').classList.toggle('active', tab === 'user');
-            document.getElementById('tabAdmin').classList.toggle('active', tab === 'admin');
-            document.getElementById('adminBadge').style.display = tab === 'admin' ? 'inline-flex' : 'none';
-            document.getElementById('loginBtn').innerHTML = tab === 'admin'
-                ? '<i class="fas fa-shield-alt"></i> Sign In as Admin'
-                : '<i class="fas fa-sign-in-alt"></i> Sign In';
-            // Highlight the matching signup link
-            document.getElementById('userSignupLink').style.display  = tab === 'admin' ? 'none' : 'flex';
-            document.getElementById('adminSignupLink').style.display = tab === 'admin' ? 'flex' : 'none';
-        }
-
-        // Show only the relevant signup link on load
-        switchTab('user');
-
         document.getElementById('loginForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const email    = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value.trim();
-            const btn      = document.getElementById('loginBtn');
+            const btn      = this.querySelector('[type="submit"]');
 
             if (!email || !password) { showAlert('Please fill in all fields.', 'warning'); return; }
 
-            setLoading(btn, true, 'Signing in...');
+            setLoading(btn, true, 'Logging in...');
             try {
                 const user = await Auth.login(email, password);
-
-                // Validate role matches selected tab
-                if (currentTab === 'admin' && user.role !== 'admin') {
-                    Auth.logout();
-                    showAlert('This account does not have administrator access.', 'error');
-                    setLoading(btn, false);
-                    return;
-                }
-                if (currentTab === 'user' && user.role === 'admin') {
-                    // Admin trying to log in via user tab — just redirect them correctly
-                }
-
                 showAlert('Login successful!', 'success');
                 setTimeout(() => {
                     window.location.href = user.role === 'admin' ? 'index.html' : 'user-index.html';

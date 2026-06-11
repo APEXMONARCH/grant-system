@@ -1,28 +1,71 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Messages | User Portal</title>
+    <title>Messages | Grant Management System</title>
     <link rel="stylesheet" href="assets/css/styles.css">
     <link rel="stylesheet" href="assets/css/dark-mode.css">
     <link rel="stylesheet" href="assets/css/user-dashboard.css">
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .msg-layout { display: grid; grid-template-columns: 320px 1fr; gap: 1rem; min-height: 500px; }
+        .msg-sidebar { background: #fff; border-radius: 12px; border: 1px solid var(--user-border, #e5e7eb); display: flex; flex-direction: column; overflow: hidden; }
+        .msg-sidebar-header { padding: .8rem 1rem; border-bottom: 1px solid #e5e7eb; background: #f9fafb; display: flex; justify-content: space-between; align-items: center; }
+        .msg-sidebar-header h3 { margin: 0; font-size: .95rem; font-weight: 600; }
+        .msg-search { padding: .55rem .9rem; border-bottom: 1px solid #f0f0f0; }
+        .msg-search input { width: 100%; border: 1px solid #e5e7eb; border-radius: 8px; padding: .4rem .75rem; font-size: .83rem; outline: none; }
+        .msg-filter-tabs { padding: .5rem .9rem; border-bottom: 1px solid #f0f0f0; display: flex; gap: .4rem; }
+        .msg-filter-tabs button { border: 1px solid #e5e7eb; background: #fff; border-radius: 20px; padding: .3rem .75rem; font-size: .78rem; cursor: pointer; }
+        .msg-filter-tabs button.active { background: #1a56db; color: #fff; border-color: #1a56db; }
+        .msg-list { flex: 1; overflow-y: auto; max-height: calc(100vh - 360px); }
+        .msg-item { padding: .8rem 1rem; border-bottom: 1px solid #f3f4f6; cursor: pointer; transition: background .12s; }
+        .msg-item:hover { background: #f9fafb; }
+        .msg-item.active { background: #eff6ff; border-left: 3px solid #1a56db; }
+        .msg-item.unread .msg-subject { font-weight: 700; color: #111827; }
+        .msg-item-header { display: flex; justify-content: space-between; gap: .4rem; }
+        .msg-sender { font-weight: 600; font-size: .87rem; color: #374151; }
+        .msg-time { font-size: .73rem; color: #9ca3af; }
+        .msg-subject { font-size: .82rem; color: #374151; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .msg-preview { font-size: .77rem; color: #6b7280; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        .msg-main { background: #fff; border-radius: 12px; border: 1px solid #e5e7eb; display: flex; flex-direction: column; min-height: 500px; overflow: hidden; }
+        .msg-main-header { padding: .85rem 1.1rem; border-bottom: 1px solid #e5e7eb; background: #f9fafb; }
+        .msg-main-header h3 { margin: 0; font-size: .97rem; font-weight: 600; }
+        .msg-main-header .sub { font-size: .8rem; color: #6b7280; margin-top: 2px; }
+        .msg-thread { flex: 1; overflow-y: auto; padding: 1rem; display: flex; flex-direction: column; gap: .8rem; max-height: calc(100vh - 420px); }
+        .msg-bubble { max-width: 80%; padding: .7rem 1rem; border-radius: 12px; font-size: .88rem; line-height: 1.55; }
+        .msg-bubble.from-admin { background: #eff6ff; border: 1px solid #bfdbfe; align-self: flex-start; }
+        .msg-bubble.from-user  { background: #f0fdf4; border: 1px solid #bbf7d0; align-self: flex-end; }
+        .msg-bubble .bubble-meta { font-size: .72rem; color: #6b7280; margin-top: .3rem; }
+        .msg-reply-bar { padding: .8rem 1rem; border-top: 1px solid #e5e7eb; display: flex; gap: .6rem; align-items: flex-end; }
+        .msg-reply-bar textarea { flex: 1; border: 1px solid #e5e7eb; border-radius: 8px; padding: .5rem .75rem; font-size: .87rem; resize: none; outline: none; font-family: inherit; min-height: 52px; }
+        .msg-reply-bar textarea:focus { border-color: #0b6bcb; box-shadow: 0 0 0 2px rgba(11,107,203,.12); }
+        .msg-empty { text-align: center; color: #9ca3af; padding: 3rem 1rem; flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .5rem; }
+        .msg-empty i { font-size: 2.5rem; color: #d1d5db; }
+
+        @media (max-width: 768px) {
+            .msg-layout { grid-template-columns: 1fr; }
+            .msg-list { max-height: 280px; }
+        }
+    </style>
 </head>
-<body class="user-shell" data-user-page="messages">
+<body data-user-page="messages">
     <div class="app-container">
-        <aside class="sidebar" id="sidebar">
-            <div class="sidebar-header"><div class="logo"><i class="fas fa-hand-holding-heart"></i><span>User Portal</span></div><button class="sidebar-toggle" id="sidebarToggle"><i class="fas fa-bars"></i></button></div>
+        <aside class="sidebar ud-sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo"><i class="fas fa-hand-holding-heart"></i><span>Grant System</span></div>
+                <button class="sidebar-toggle" id="sidebarToggle"><i class="fas fa-bars"></i></button>
+            </div>
             <nav class="sidebar-nav">
-                <a href="user-index.html" class="nav-item"><i class="fas fa-gauge"></i><span>Dashboard</span></a>
-                <a href="user-grants-browse.html" class="nav-item"><i class="fas fa-compass"></i><span>Browse Grants</span></a>
-                <a href="user-apply-grant.html" class="nav-item"><i class="fas fa-pen-to-square"></i><span>Apply</span></a>
-                <a href="user-applications.html" class="nav-item"><i class="fas fa-folder-open"></i><span>My Applications</span></a>
-                <a href="user-messages.html" class="nav-item active"><i class="fas fa-envelope-open-text"></i><span>Messages</span></a>
-                <a href="user-profile.html" class="nav-item"><i class="fas fa-user-gear"></i><span>Profile</span></a>
+                <a href="user-index.html" class="nav-item"><i class="fas fa-tachometer-alt"></i><span>Dashboard</span></a>
+                <a href="user-grants-browse.html" class="nav-item"><i class="fas fa-search"></i><span>Browse Grants</span></a>
+                <a href="user-applications.html" class="nav-item"><i class="fas fa-clipboard-list"></i><span>My Applications</span></a>
+                <a href="user-messages.html" class="nav-item active"><i class="fas fa-envelope"></i><span>Messages</span></a>
+                <a href="user-profile.html" class="nav-item"><i class="fas fa-user"></i><span>Profile</span></a>
             </nav>
-            <div class="sidebar-footer"><div class="user-info-mini"><i class="fas fa-user-circle"></i><span id="userMiniName">Applicant User</span></div></div>
+            <div class="sidebar-footer"><div class="user-info-mini"><i class="fas fa-user-circle"></i><span id="userMiniName">User</span></div></div>
         </aside>
         <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
@@ -32,52 +75,210 @@
                 <h1 class="page-title">Messages</h1>
                 <div class="topbar-actions">
                     <button class="icon-btn" id="notificationBtn"><i class="fas fa-bell"></i><span class="badge" id="topNotificationCount">0</span></button>
-                    <div class="profile-dropdown"><button class="profile-btn" id="profileBtn"><img class="avatar" id="topAvatar" src="https://ui-avatars.com/api/?name=Applicant+User&background=0b6bcb&color=fff" alt="Profile"><i class="fas fa-chevron-down"></i></button><div class="dropdown-menu" id="profileDropdown"><a href="user-profile.html"><i class="fas fa-user"></i> Profile</a><a href="user-messages.html"><i class="fas fa-envelope"></i> Messages</a><hr><a href="signup.html" onclick="handleLogout(event)"><i class="fas fa-sign-out-alt"></i> Logout</a></div></div>
+                    <div class="profile-dropdown">
+                        <button class="profile-btn" id="profileBtn">
+                            <img class="avatar" id="topAvatar" src="https://ui-avatars.com/api/?name=User&background=0b6bcb&color=fff" alt="Profile">
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="dropdown-menu" id="profileDropdown">
+                            <a href="user-profile.html"><i class="fas fa-user"></i> Profile</a>
+                            <a href="user-messages.html"><i class="fas fa-envelope"></i> Messages</a>
+                            <hr>
+                            <a href="login.html" onclick="handleLogout(event)"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                        </div>
+                    </div>
                 </div>
             </header>
 
             <div class="content-wrapper">
                 <section class="user-hero">
                     <h2>Your Inbox</h2>
-                    <p>Track application updates, deadline alerts, and system notifications in one place.</p>
+                    <p>Messages from the Grant Committee appear here. You can reply directly to any conversation.</p>
                 </section>
 
                 <section class="card">
-                    <div class="card-body messages-toolbar">
-                        <div class="messages-search-wrap">
-                            <i class="fas fa-search"></i>
-                            <input id="messageSearch" type="text" placeholder="Search subject, sender, or content">
-                        </div>
-                        <div class="messages-filter-tabs" id="messageFilterTabs">
-                            <button class="btn btn-secondary btn-small active" data-filter="all" type="button">All</button>
-                            <button class="btn btn-secondary btn-small" data-filter="unread" type="button">Unread</button>
-                            <button class="btn btn-secondary btn-small" data-filter="read" type="button">Read</button>
-                        </div>
-                        <button class="btn btn-secondary btn-small" id="markAllReadBtn" type="button" title="Mark all as read" aria-label="Mark all as read">
-                            <i class="fas fa-check"></i> Mark as read
-                        </button>
-                    </div>
-                </section>
+                    <div class="card-body">
+                        <div class="msg-layout">
+                            <!-- Message List -->
+                            <div class="msg-sidebar">
+                                <div class="msg-sidebar-header">
+                                    <h3>Inbox</h3>
+                                    <span id="unreadBadge" style="font-size:.75rem;color:#6b7280;"></span>
+                                </div>
+                                <div class="msg-search">
+                                    <input type="text" id="msgSearch" placeholder="Search messages…" />
+                                </div>
+                                <div class="msg-filter-tabs">
+                                    <button class="active" data-filter="all">All</button>
+                                    <button data-filter="unread">Unread</button>
+                                    <button data-filter="read">Read</button>
+                                </div>
+                                <div class="msg-list" id="msgList">
+                                    <div style="text-align:center;padding:2rem;color:#9ca3af;font-size:.85rem;">Loading…</div>
+                                </div>
+                            </div>
 
-                <section class="message-layout">
-                    <div class="message-thread-wrap">
-                        <div class="message-thread-head">
-                            <h3>Messages</h3>
-                            <span class="ud-stat-note" id="messageCountNote">0 items</span>
+                            <!-- Thread Detail -->
+                            <div class="msg-main" id="msgMain">
+                                <div class="msg-empty">
+                                    <i class="fas fa-inbox"></i>
+                                    <p style="font-weight:600;color:#374151;">Select a message</p>
+                                    <p style="font-size:.85rem;">Click any message on the left to read it.</p>
+                                </div>
+                            </div>
                         </div>
-                        <div class="message-thread" id="messageThread"></div>
                     </div>
-                    <div class="message-detail" id="messageDetail"><p class="ud-stat-note">Select a message to read.</p></div>
                 </section>
             </div>
         </main>
     </div>
+
     <script src="assets/js/api.js"></script>
     <script src="assets/js/auth.js"></script>
     <script src="assets/js/app.js"></script>
-        <script src="assets/js/dark-mode.js"></script>
-        <script src="assets/js/user-dashboard.js"></script>
-    <script src="assets/js/user-dashboard.js"></script>
+    <script src="assets/js/dark-mode.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        if (!Auth.requireAuth()) return;
+
+        const user = Auth.getUser();
+        if (user) {
+            const name = `${user.first_name||''} ${user.last_name||''}`.trim();
+            const mini = document.getElementById('userMiniName');
+            if (mini) mini.textContent = name;
+            const av = document.getElementById('topAvatar');
+            if (av) av.src = user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=0b6bcb&color=fff`;
+        }
+
+        loadMessages('all');
+
+        // Filter tabs
+        document.querySelectorAll('.msg-filter-tabs button').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.msg-filter-tabs button').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                loadMessages(this.dataset.filter, document.getElementById('msgSearch').value.trim());
+            });
+        });
+
+        // Search
+        let timer;
+        document.getElementById('msgSearch').addEventListener('input', function() {
+            clearTimeout(timer);
+            const filter = document.querySelector('.msg-filter-tabs button.active')?.dataset.filter || 'all';
+            timer = setTimeout(() => loadMessages(filter, this.value.trim()), 350);
+        });
+    });
+
+    let activeThreadId = null;
+
+    async function loadMessages(filter = 'all', q = '') {
+        try {
+            const qs = new URLSearchParams({ filter, q }).toString();
+            const res = await API.get('/messages?' + qs);
+            const items = res.data?.items || [];
+            const unread = items.filter(m => !m.read).length;
+            document.getElementById('unreadBadge').textContent = unread ? `${unread} unread` : '';
+
+            const list = document.getElementById('msgList');
+            if (!items.length) {
+                list.innerHTML = '<div style="text-align:center;padding:2rem;color:#9ca3af;font-size:.85rem;">No messages found.</div>';
+                return;
+            }
+            list.innerHTML = items.map(m => `
+                <div class="msg-item${!m.read ? ' unread' : ''}${m.id === activeThreadId ? ' active' : ''}" 
+                     data-id="${m.id}" onclick="openThread(${m.id})">
+                    <div class="msg-item-header">
+                        <span class="msg-sender">${escH(m.sender || 'Grant Committee')}</span>
+                        <span class="msg-time">${timeAgo(m.created_at)}</span>
+                    </div>
+                    <div class="msg-subject">${escH(m.subject || '(no subject)')}</div>
+                    <div class="msg-preview">${escH((m.message||'').substring(0,60))}…</div>
+                </div>
+            `).join('');
+        } catch(e) {
+            document.getElementById('msgList').innerHTML = '<div style="padding:1rem;color:#ef4444;font-size:.85rem;">Failed to load messages.</div>';
+        }
+    }
+
+    async function openThread(threadId) {
+        activeThreadId = threadId;
+        document.querySelectorAll('.msg-item').forEach(el => {
+            el.classList.toggle('active', parseInt(el.dataset.id) === threadId);
+            if (parseInt(el.dataset.id) === threadId) el.classList.remove('unread');
+        });
+
+        const main = document.getElementById('msgMain');
+        main.innerHTML = `
+            <div class="msg-main-header">
+                <h3 id="threadSubject">Loading…</h3>
+                <div class="sub" id="threadFrom"></div>
+            </div>
+            <div class="msg-thread" id="threadBody"><div style="text-align:center;padding:2rem;color:#9ca3af;">Loading…</div></div>
+            <div class="msg-reply-bar">
+                <textarea id="replyBox" placeholder="Write a reply… (Ctrl+Enter to send)" rows="2"></textarea>
+                <button class="btn btn-primary" onclick="sendReply(${threadId})" style="padding:.55rem .9rem;white-space:nowrap;" id="replyBtn">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        `;
+
+        document.getElementById('replyBox').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) sendReply(threadId);
+        });
+
+        try {
+            const res = await API.get(`/messages/${threadId}/thread`);
+            const items = res.data?.items || [];
+            if (items.length) {
+                document.getElementById('threadSubject').textContent = items[0].subject || '(no subject)';
+                document.getElementById('threadFrom').textContent = 'From: ' + (items[0].sender || 'Grant Committee');
+            }
+            const body = document.getElementById('threadBody');
+            body.innerHTML = items.map(m => {
+                const isAdmin = m.sender_role === 'admin' || m.sender_role === 'system';
+                return `<div class="msg-bubble ${isAdmin ? 'from-admin' : 'from-user'}">
+                    <div>${escH(m.message)}</div>
+                    <div class="bubble-meta">${escH(m.sender)} · ${formatDate(m.created_at)}</div>
+                </div>`;
+            }).join('');
+            body.scrollTop = body.scrollHeight;
+            // Refresh unread count
+            const filter = document.querySelector('.msg-filter-tabs button.active')?.dataset.filter || 'all';
+            loadMessages(filter, document.getElementById('msgSearch').value.trim());
+        } catch(e) {
+            document.getElementById('threadBody').innerHTML = '<div style="padding:1rem;color:#ef4444;font-size:.85rem;">Failed to load thread.</div>';
+        }
+    }
+
+    async function sendReply(threadId) {
+        const box = document.getElementById('replyBox');
+        const msg = box.value.trim();
+        if (!msg) return;
+        const btn = document.getElementById('replyBtn');
+        btn.disabled = true;
+        try {
+            await API.post('/messages', { thread_id: threadId, message: msg });
+            box.value = '';
+            openThread(threadId);
+        } catch(e) {
+            showAlert(e.message || 'Failed to send reply.', 'error');
+        }
+        btn.disabled = false;
+    }
+
+    function escH(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+    function timeAgo(dateStr) {
+        const d = new Date(dateStr), now = new Date();
+        const diff = Math.floor((now - d) / 60000);
+        if (diff < 1) return 'just now';
+        if (diff < 60) return diff + 'm ago';
+        if (diff < 1440) return Math.floor(diff/60) + 'h ago';
+        return Math.floor(diff/1440) + 'd ago';
+    }
+    function formatDate(dateStr) {
+        return new Date(dateStr).toLocaleString('en-GB', { day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' });
+    }
+    </script>
 </body>
 </html>
-
