@@ -1,9 +1,16 @@
 -- ─────────────────────────────────────────────────────────────
--- Grant Management System — MySQL Schema
--- Run this once in phpMyAdmin or MySQL CLI:
+-- Grant Management System — MySQL Schema (COMPLETE, v2)
+--
+-- Run once in phpMyAdmin or MySQL CLI:
 --   CREATE DATABASE grant_system CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 --   USE grant_system;
---   (then paste all of this)
+--   (then paste / import all of this)
+--
+-- Changes from v1:
+--   • messages: added thread_id, parent_id, sender_role, sender_id (two-way threading)
+--   • NEW table: audit_logs (used by AuditController.php)
+--   • application_documents: added file_id column + index (used by UploadController.php)
+--   • Fixed seed admin email typo (was admin@grantystem.com)
 -- ─────────────────────────────────────────────────────────────
 
 SET FOREIGN_KEY_CHECKS = 0;
@@ -102,16 +109,20 @@ CREATE TABLE IF NOT EXISTS applications (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- ── Application Documents ────────────────────────────────────
+-- file_id is the unique generated filename (e.g. doc_64f1ab... .pdf)
+-- returned by helpers/Upload.php — UploadController looks files up by it.
 CREATE TABLE IF NOT EXISTS application_documents (
   id               INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   application_id   INT UNSIGNED NOT NULL,
+  file_id          VARCHAR(100),
   label            VARCHAR(255),
   file_name        VARCHAR(255),
   file_path        VARCHAR(500),
   file_size        INT UNSIGNED,
   mime_type        VARCHAR(100),
   uploaded_at      TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (application_id) REFERENCES applications(id) ON DELETE CASCADE
+  FOREIGN KEY (application_id) REFERENCES applications(id) ON DELETE CASCADE,
+  INDEX idx_file_id (file_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- ── Beneficiaries ────────────────────────────────────────────
@@ -129,17 +140,29 @@ CREATE TABLE IF NOT EXISTS beneficiaries (
   FOREIGN KEY (grant_id)       REFERENCES grants(id)       ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- ── Messages ─────────────────────────────────────────────────
+-- ── Messages (two-way threading) ─────────────────────────────
+-- thread_id : id of the root message in the thread (root points to itself)
+-- parent_id : the message this one replies to (NULL for root messages)
+-- sender_role: 'admin' | 'applicant' | 'system' — drives bubble alignment in UI
+-- sender_id : users.id of the actual sender (nullable for system messages)
 CREATE TABLE IF NOT EXISTS messages (
-  id          INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  user_id     INT UNSIGNED NOT NULL,
-  subject     VARCHAR(255),
-  message     TEXT,
-  sender      VARCHAR(100) NOT NULL DEFAULT 'Grant Committee',
-  is_read     TINYINT(1)   NOT NULL DEFAULT 0,
-  created_at  TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-  INDEX idx_user_read (user_id, is_read)
+  id           INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  user_id      INT UNSIGNED NOT NULL,          -- the applicant the thread belongs to
+  thread_id    INT UNSIGNED NULL,
+  parent_id    INT UNSIGNED NULL,
+  subject      VARCHAR(255),
+  message      TEXT,
+  sender       VARCHAR(100) NOT NULL DEFAULT 'Grant Committee',
+  sender_role  ENUM('admin','applicant','system') NOT NULL DEFAULT 'system',
+  sender_id    INT UNSIGNED NULL,
+  is_read      TINYINT(1)   NOT NULL DEFAULT 0,
+  created_at   TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id)   REFERENCES users(id)    ON DELETE CASCADE,
+  FOREIGN KEY (sender_id) REFERENCES users(id)    ON DELETE SET NULL,
+  FOREIGN KEY (thread_id) REFERENCES messages(id) ON DELETE CASCADE,
+  INDEX idx_user_read (user_id, is_read),
+  INDEX idx_thread    (thread_id),
+  INDEX idx_parent    (parent_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- ── Notifications ────────────────────────────────────────────
@@ -154,12 +177,47 @@ CREATE TABLE IF NOT EXISTS notifications (
   INDEX idx_user_read (user_id, is_read)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- ── Audit Logs (used by controllers/AuditController.php) ─────
+CREATE TABLE IF NOT EXISTS audit_logs (
+  id          INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  user_id     INT UNSIGNED NULL,
+  action      VARCHAR(255) NOT NULL,
+  detail      TEXT,
+  level       ENUM('info','warning','error','critical') NOT NULL DEFAULT 'info',
+  ip_address  VARCHAR(64),
+  user_agent  VARCHAR(255),
+  created_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL,
+  INDEX idx_level   (level),
+  INDEX idx_created (created_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 SET FOREIGN_KEY_CHECKS = 1;
 
 -- ── Seed: default admin account ──────────────────────────────
--- Password: Admin@1234  (CHANGE THIS immediately after first login)
+-- Email:    admin@grantsystem.com
+-- Password: Admin@1234   (CHANGE THIS immediately after first login)
 INSERT INTO users (first_name, last_name, email, password, role, status)
-VALUES ('Admin', 'User', 'admin@grantystem.com',
+VALUES ('Admin', 'User', 'admin@grantsystem.com',
         '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
         'admin', 'active')
 ON DUPLICATE KEY UPDATE id = id;
+
+-- ─────────────────────────────────────────────────────────────
+-- MIGRATION (only if you ALREADY have data and don't want to
+-- drop the database — run these instead of re-importing):
+-- ─────────────────────────────────────────────────────────────
+-- ALTER TABLE messages
+--   ADD COLUMN thread_id   INT UNSIGNED NULL AFTER user_id,
+--   ADD COLUMN parent_id   INT UNSIGNED NULL AFTER thread_id,
+--   ADD COLUMN sender_role ENUM('admin','applicant','system') NOT NULL DEFAULT 'system' AFTER sender,
+--   ADD COLUMN sender_id   INT UNSIGNED NULL AFTER sender_role,
+--   ADD INDEX idx_thread (thread_id),
+--   ADD INDEX idx_parent (parent_id);
+-- UPDATE messages SET thread_id = id WHERE thread_id IS NULL;
+--
+-- ALTER TABLE application_documents
+--   ADD COLUMN file_id VARCHAR(100) NULL AFTER application_id,
+--   ADD INDEX idx_file_id (file_id);
+--
+-- (audit_logs: just run the CREATE TABLE block above on its own)
