@@ -22,7 +22,7 @@ define('JWT_EXPIRY', 60 * 60 * 24);    // 24 hours
 // Anyone who knows this key can register as an admin.
 // Change this to a strong, private passphrase. Never share it publicly.
 // Example: 'MyGrantSystem$AdminKey!2024'
-define('ADMIN_REGISTRATION_SECRET', 'REPLACE_WITH_YOUR_ADMIN_SECRET_KEY');
+define('ADMIN_REGISTRATION_SECRET', 'GrantSystemAdmin2222');
 
 // File uploads
 define('UPLOAD_DIR',    __DIR__ . '/../uploads/applications/');
