@@ -4,7 +4,7 @@
 # ─────────────────────────────────────────────────────────────
 
 # ── Sensitive config — NEVER commit real credentials ─────────
-api/config/constants.php
+# api/config/constants.php
 
 # ── Uploaded files — can be large and contain personal docs ──
 api/uploads/
