@@ -149,7 +149,7 @@
 
             setLoading(btn, true, 'Creating admin account...');
             try {
-                const res = await fetch(API.base + '/auth/register-admin', {
+                const res = await fetch(API.BASE_URL + '/auth/register-admin', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ first_name: firstName, last_name: lastName, email, password, admin_secret: adminSecret })
