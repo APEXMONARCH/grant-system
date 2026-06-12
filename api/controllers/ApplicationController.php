@@ -42,7 +42,7 @@ if ($id === 'ai-check' && $method === 'POST') {
         'email'          => 'Email Address',
         'research_title' => 'Research Title',
         'objectives'     => 'Research Objectives',
-        'methodology'    => 'Methodology',
+        'methodology'    => 'Research Abstract',
     ];
     foreach ($required as $field => $label) {
         if (empty($body[$field])) {

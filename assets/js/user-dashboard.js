@@ -216,8 +216,12 @@ async function initApplyForm() {
     });
   });
 
-  // Submit
-  document.getElementById('applyForm')?.addEventListener('submit', submitApplication);
+  // Submit — single entry point (button click, Enter key, etc.)
+  document.getElementById('applyForm')?.addEventListener('submit', handleApplySubmit);
+  document.getElementById('submitApplicationBtn')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    handleApplySubmit(e);
+  });
 
   goApplyStep(1);
 }
@@ -273,6 +277,7 @@ function updateFileName(nameId, name) {
 function goApplyStep(step) {
   if (step < 1 || step > APPLY_STEPS) return;
   if (step === APPLY_STEPS) populateApplyReview();
+  if (step === 3 && !document.querySelector('#budgetRowsBody tr')) addBudgetRow();
   applyStep = step;
 
   document.querySelectorAll('.apply-step-panel').forEach((p, i) => {
@@ -326,6 +331,28 @@ function validateApplyStep() {
   return valid;
 }
 
+// Shared payload for AI check and final submission
+function collectBudgetItems() {
+  return [...document.querySelectorAll('#budgetRowsBody tr')].map(row => ({
+    item:        row.querySelector('.budget-item')?.value?.trim() || '',
+    description: row.querySelector('.budget-desc')?.value?.trim() || '',
+    cost:        parseFloat(row.querySelector('.budget-cost')?.value || 0),
+  })).filter(r => r.item || r.description || r.cost > 0);
+}
+
+function getApplyFormPayload() {
+  return {
+    grant_id:          document.getElementById('hiddenGrantId')?.value || '',
+    full_name:         document.getElementById('appFullName')?.value?.trim() || '',
+    email:             document.getElementById('appEmail')?.value?.trim() || '',
+    research_title:    document.getElementById('researchTitle')?.value?.trim() || '',
+    objectives:        document.getElementById('researchObjectives')?.value?.trim() || '',
+    methodology:       document.getElementById('researchAbstract')?.value?.trim() || '',
+    digital_signature: document.getElementById('digitalSignature')?.value?.trim() || '',
+    budget_items:      collectBudgetItems(),
+  };
+}
+
 // Budget rows
 function addBudgetRow() {
   const tbody = document.getElementById('budgetRowsBody');
@@ -367,15 +394,41 @@ function reviewItem(label, val) {
   return `<div><strong style="font-size:.8rem;color:#6b7280;">${label}:</strong><br><span style="font-size:.9rem;">${escapeHtml(val || '—')}</span></div>`;
 }
 
-// Submit
-async function submitApplication(e) {
+// Submit flow: declaration → AI check → post
+async function handleApplySubmit(e) {
   e.preventDefault();
-  const btn = document.getElementById('submitApplicationBtn');
 
-  if (!document.getElementById('declarationCheck')?.checked) {
+  const declaration = document.getElementById('declarationCheck');
+  if (!declaration?.checked) {
     showAlert('Please check the declaration to confirm.', 'warning');
+    declaration?.focus();
     return;
   }
+
+  const step6Panel = document.querySelector('.apply-step-panel[data-step="6"]');
+  const required = [...(step6Panel?.querySelectorAll('[required]') || [])];
+  let valid = true;
+  required.forEach(inp => {
+    inp.classList.remove('input-error');
+    if (inp.type === 'checkbox') return;
+    if (!inp.value?.trim()) { inp.classList.add('input-error'); valid = false; }
+  });
+  if (!valid) {
+    showAlert('Please complete your signature and date before submitting.', 'warning');
+    return;
+  }
+
+  if (typeof AiCheck !== 'undefined') {
+    const ok = await AiCheck.run(getApplyFormPayload());
+    if (!ok) return;
+  }
+
+  await submitApplication(e);
+}
+
+async function submitApplication(e) {
+  e?.preventDefault?.();
+  const btn = document.getElementById('submitApplicationBtn');
 
   const fd = new FormData();
 
@@ -411,13 +464,7 @@ async function submitApplication(e) {
   };
   Object.entries(fields).forEach(([k, v]) => v != null && fd.append(k, v));
 
-  // Budget rows as JSON
-  const budgetRows = [...document.querySelectorAll('#budgetRowsBody tr')].map(row => ({
-    item:        row.querySelector('.budget-item')?.value,
-    description: row.querySelector('.budget-desc')?.value,
-    cost:        row.querySelector('.budget-cost')?.value,
-  }));
-  fd.append('budget_items', JSON.stringify(budgetRows));
+  fd.append('budget_items', JSON.stringify(collectBudgetItems()));
 
   // File uploads
   ['uploadProposal','uploadCv','uploadPublications','uploadApprovalLetter','uploadPreviousEvidence','uploadSupportingDocs'].forEach(id => {
