@@ -114,7 +114,7 @@
 }
 
 .landing-page .btn-block {
-    width: 100%;
+    display: flex;
 }
 
 .landing-page .btn-primary {
