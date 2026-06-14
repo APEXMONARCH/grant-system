@@ -1,9 +1,9 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Grants | Grant Management System</title>
+    <title>Dashboard | Grant Management System</title>
     <link rel="stylesheet" href="assets/css/styles.css">
     <link rel="stylesheet" href="assets/css/dark-mode.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -24,11 +24,11 @@
             </div>
             
             <nav class="sidebar-nav">
-                <a href="admin-dashboard.html" class="nav-item">
+                <a href="admin-dashboard.html" class="nav-item active">
                     <i class="fas fa-tachometer-alt"></i>
                     <span>Dashboard</span>
                 </a>
-                <a href="grants.html" class="nav-item active">
+                <a href="grants.html" class="nav-item">
                     <i class="fas fa-file-alt"></i>
                     <span>Grants</span>
                 </a>
@@ -68,7 +68,7 @@
                 <button class="mobile-menu-btn" id="mobileMenuBtn">
                     <i class="fas fa-bars"></i>
                 </button>
-                <h1 class="page-title">Grants</h1>
+                <h1 class="page-title">Dashboard</h1>
                 <div class="topbar-actions">
                     <button class="icon-btn" id="notificationBtn">
                         <i class="fas fa-bell"></i>
@@ -89,102 +89,116 @@
                 </div>
             </header>
             
-            <!-- Content -->
+            <!-- Dashboard Content -->
             <div class="content-wrapper">
-                <!-- Header with Action Button -->
-                <div class="page-header">
-                    <div class="header-left">
-                        <h2>All Grants</h2>
-                        <p class="page-description">Manage and monitor all grant programs</p>
+                <!-- Stats Cards -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-dollar-sign"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Total Funds</h3>
+                            <p class="stat-value" id="statTotalFunds">—</p>
+                            <span class="stat-trend positive" id="trendTotal">
+                                <i class="fas fa-arrow-up"></i> Loading...
+                            </span>
+                        </div>
                     </div>
-                    <div class="header-right">
-                        <button class="btn btn-primary" id="addGrantBtn" type="button">
-                            <i class="fas fa-plus"></i>
-                            <span>New Grant</span>
-                        </button>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon allocated">
+                            <i class="fas fa-chart-pie"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Allocated Funds</h3>
+                            <p class="stat-value" id="statAllocatedFunds">—</p>
+                            <span class="stat-trend neutral" id="trendAllocated">
+                                <i class="fas fa-chart-line"></i> Loading...
+                            </span>
+                        </div>
                     </div>
-                </div>
-                
-                <!-- Filters Section -->
-                <div class="filters-card">
-                    <div class="filters-grid">
-                        <div class="filter-group">
-                            <label for="statusFilter">Status</label>
-                            <select id="statusFilter" class="filter-select">
-                                <option value="all">All Status</option>
-                                <option value="active">Active</option>
-                                <option value="pending">Pending</option>
-                                <option value="draft">Draft</option>
-                                <option value="closed">Closed</option>
-                            </select>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon remaining">
+                            <i class="fas fa-coins"></i>
                         </div>
-                        
-                        <div class="filter-group">
-                            <label for="categoryFilter">Category</label>
-                            <select id="categoryFilter" class="filter-select">
-                                <option value="all">All Categories</option>
-                                <option value="business">Business & SME</option>
-                                <option value="research">Research & Innovation</option>
-                                <option value="education">Education</option>
-                                <option value="community">Community Development</option>
-                                <option value="arts">Arts & Culture</option>
-                            </select>
-                        </div>
-                        
-                        <div class="filter-group">
-                            <label for="dateFilter">Date</label>
-                            <select id="dateFilter" class="filter-select">
-                                <option value="all">All Time</option>
-                                <option value="today">Today</option>
-                                <option value="week">This Week</option>
-                                <option value="month">This Month</option>
-                                <option value="quarter">This Quarter</option>
-                                <option value="year">This Year</option>
-                            </select>
-                        </div>
-                        
-                        <div class="filter-group search-group">
-                            <label for="searchInput">Search</label>
-                            <div class="search-wrapper">
-                                <i class="fas fa-search"></i>
-                                <input type="text" id="searchInput" placeholder="Search by grant name..." class="search-input">
-                            </div>
+                        <div class="stat-info">
+                            <h3>Remaining Funds</h3>
+                            <p class="stat-value" id="statRemainingFunds">—</p>
+                            <span class="stat-trend negative" id="trendRemaining">
+                                <i class="fas fa-arrow-down"></i> Loading...
+                            </span>
                         </div>
                     </div>
                 </div>
                 
-                <!-- Grants Table -->
+                <!-- Funds Overview Chart -->
                 <div class="card">
                     <div class="card-header">
-                        <h2>Grant Programs</h2>
-                        <div class="table-info">
-                            <span id="resultsCount">5</span> grants found
+                        <h2>Funds Overview</h2>
+                        <select class="chart-select">
+                            <option>Last 6 Months</option>
+                            <option>Last Year</option>
+                            <option>All Time</option>
+                        </select>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="fundsChart" class="chart-placeholder"></canvas>
+                        <div class="chart-legend">
+                            <span><i class="fas fa-circle" style="color: #1a56db;"></i> Allocated</span>
+                            <span><i class="fas fa-circle" style="color: #10b981;"></i> Available</span>
+                            <span><i class="fas fa-circle" style="color: #f59e0b;"></i> Disbursed</span>
                         </div>
+                    </div>
+                </div>
+                
+                <!-- Active Grants Table -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Active Grants</h2>
+                        <a href="grants.html" class="view-all">View All <i class="fas fa-arrow-right"></i></a>
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
-                            <table class="data-table grants-table" id="grantsTable">
+                            <table class="data-table">
                                 <thead>
                                     <tr>
                                         <th>Grant Name</th>
                                         <th>Budget</th>
                                         <th>Applicants</th>
                                         <th>Status</th>
-                                        <th>Actions</th>
                                     </tr>
                                 </thead>
-                                <tbody id="grantsTableBody">
-                                    <!-- Grants will be populated by JavaScript -->
+                                <tbody>
+                                    <!-- Populated by dashboard.js -->
                                 </tbody>
                             </table>
                         </div>
-                        
-                        <!-- Empty State -->
-                        <div id="emptyState" class="empty-state" style="display: none;">
-                            <i class="fas fa-inbox"></i>
-                            <h3>No grants found</h3>
-                            <p>Try adjusting your filters or create a new grant</p>
-                            <button class="btn btn-secondary" id="emptyStateAddGrantBtn" type="button">Create New Grant</button>
+                    </div>
+                </div>
+                
+                <!-- Recent Applications Table -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Recent Applications</h2>
+                        <a href="applications.html" class="view-all">View All <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Applicant Name</th>
+                                        <th>Grant</th>
+                                        <th>Status</th>
+                                        <th>Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Populated by dashboard.js -->
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
@@ -192,10 +206,11 @@
         </main>
     </div>
     
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script src="assets/js/api.js"></script>
     <script src="assets/js/auth.js"></script>
     <script src="assets/js/app.js"></script>
     <script src="assets/js/dark-mode.js"></script>
-    <script src="assets/js/grants.js"></script>
+    <script src="assets/js/dashboard.js"></script>
 </body>
 </html>

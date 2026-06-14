@@ -3,214 +3,275 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Dashboard | Grant Management System</title>~
-    <link rel="stylesheet" href="assets/css/styles.css">
-    <link rel="stylesheet" href="assets/css/dark-mode.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <meta name="description" content="Grant Management System — browse grants, submit applications, and manage research funding for universities and institutions.">
+    <title>Grant Management System | Research Funding Made Simple</title>
+    <link rel="stylesheet" href="assets/css/landing.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body>
-    <div class="app-container">
-        <!-- Sidebar -->
-        <aside class="sidebar" id="sidebar">
-            <div class="sidebar-header">
-                <div class="logo">
-                    <i class="fas fa-hand-holding-heart"></i>
-                    <span>Grant Management System</span>
-                </div>
-                <button class="sidebar-toggle" id="sidebarToggle">
-                    <i class="fas fa-bars"></i>
-                </button>
-            </div>
-            
-            <nav class="sidebar-nav">
-                <a href="index.html" class="nav-item active">
-                    <i class="fas fa-tachometer-alt"></i>
-                    <span>Dashboard</span>
-                </a>
-                <a href="grants.html" class="nav-item">
-                    <i class="fas fa-file-alt"></i>
-                    <span>Grants</span>
-                </a>
-                <a href="applications.html" class="nav-item">
-                    <i class="fas fa-clipboard-list"></i>
-                    <span>Applications</span>
-                </a>
-                <a href="beneficiaries.html" class="nav-item">
-                    <i class="fas fa-users"></i>
-                    <span>Beneficiaries</span>
-                </a>
-                <a href="reports.html" class="nav-item">
-                    <i class="fas fa-chart-line"></i>
-                    <span>Reports</span>
-                </a>
-                <a href="settings.html" class="nav-item">
-                    <i class="fas fa-cog"></i>
-                    <span>Settings</span>
-                </a>
+<body class="landing-page">
+
+    <!-- Navigation -->
+    <header class="landing-nav" id="landingNav">
+        <div class="landing-container landing-nav-inner">
+            <a href="index.html" class="landing-logo">
+                <i class="fas fa-hand-holding-heart"></i>
+                <span>Grant System</span>
+            </a>
+            <nav class="landing-nav-links" id="navLinks">
+                <a href="#features">Features</a>
+                <a href="#how-it-works">How It Works</a>
+                <a href="#portals">Portals</a>
             </nav>
-            
-            <div class="sidebar-footer">
-                <div class="user-info-mini">
-                    <i class="fas fa-user-circle"></i>
-                    <span>Admin User</span>
-                </div>
+            <div class="landing-nav-actions">
+                <a href="login.html" class="btn btn-ghost">Log In</a>
+                <a href="signup.html" class="btn btn-primary">Get Started</a>
             </div>
-        </aside>
-        
-        <!-- Mobile overlay -->
-        <div class="sidebar-overlay" id="sidebarOverlay"></div>
-        
-        <!-- Main Content -->
-        <main class="main-content">
-            <!-- Topbar -->
-            <header class="topbar">
-                <button class="mobile-menu-btn" id="mobileMenuBtn">
-                    <i class="fas fa-bars"></i>
-                </button>
-                <h1 class="page-title">Dashboard</h1>
-                <div class="topbar-actions">
-                    <button class="icon-btn" id="notificationBtn">
-                        <i class="fas fa-bell"></i>
-                        <span class="badge">3</span>
-                    </button>
-                    <div class="profile-dropdown">
-                        <button class="profile-btn" id="profileBtn">
-                            <img src="https://ui-avatars.com/api/?name=Admin+User&background=1a56db&color=fff" alt="Profile" class="avatar">
-                            <i class="fas fa-chevron-down"></i>
-                        </button>
-                        <div class="dropdown-menu" id="profileDropdown">
-                            <a href="#"><i class="fas fa-user"></i> Profile</a>
-                            <a href="settings.html"><i class="fas fa-cog"></i> Settings</a>
-                            <hr>
-                            <a href="signup.html" onclick="handleLogout(event)"><i class="fas fa-sign-out-alt"></i> Logout</a>
-                        </div>
+            <button class="landing-menu-toggle" id="menuToggle" aria-label="Toggle menu">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Hero -->
+    <section class="landing-hero">
+        <div class="landing-container landing-hero-grid">
+            <div class="landing-hero-content">
+                <span class="landing-badge"><i class="fas fa-university"></i> For Universities &amp; Research Institutions</span>
+                <h1>Manage Research Grants From Application to Disbursement</h1>
+                <p class="landing-hero-lead">
+                    A full-stack platform where administrators create and review grants, and applicants browse opportunities, submit multi-step applications, and track their status — all in one place.
+                </p>
+                <div class="landing-hero-actions">
+                    <a href="signup.html" class="btn btn-primary btn-large">
+                        <i class="fas fa-user-plus"></i> Create Applicant Account
+                    </a>
+                    <a href="login.html" class="btn btn-outline btn-large">
+                        <i class="fas fa-right-to-bracket"></i> Log In
+                    </a>
+                </div>
+                <p class="landing-hero-note">
+                    <i class="fas fa-lock"></i> You must be logged in to browse grants, apply, or access portal features.
+                </p>
+            </div>
+            <div class="landing-hero-visual">
+                <div class="landing-hero-image-wrap">
+                    <img
+                        src="assets/images/hero-grant-system.png"
+                        alt="Researchers collaborating on grant applications at a university"
+                        class="landing-hero-image"
+                        width="640"
+                        height="360"
+                    >
+                </div>
+                <div class="landing-hero-float landing-hero-float--1">
+                    <i class="fas fa-file-circle-check"></i>
+                    <div>
+                        <strong>Multi-step Applications</strong>
+                        <span>Upload docs &amp; track status</span>
                     </div>
                 </div>
-            </header>
-            
-            <!-- Dashboard Content -->
-            <div class="content-wrapper">
-                <!-- Stats Cards -->
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-icon">
-                            <i class="fas fa-dollar-sign"></i>
-                        </div>
-                        <div class="stat-info">
-                            <h3>Total Funds</h3>
-                            <p class="stat-value" id="statTotalFunds">—</p>
-                            <span class="stat-trend positive" id="trendTotal">
-                                <i class="fas fa-arrow-up"></i> Loading...
-                            </span>
-                        </div>
-                    </div>
-                    
-                    <div class="stat-card">
-                        <div class="stat-icon allocated">
-                            <i class="fas fa-chart-pie"></i>
-                        </div>
-                        <div class="stat-info">
-                            <h3>Allocated Funds</h3>
-                            <p class="stat-value" id="statAllocatedFunds">—</p>
-                            <span class="stat-trend neutral" id="trendAllocated">
-                                <i class="fas fa-chart-line"></i> Loading...
-                            </span>
-                        </div>
-                    </div>
-                    
-                    <div class="stat-card">
-                        <div class="stat-icon remaining">
-                            <i class="fas fa-coins"></i>
-                        </div>
-                        <div class="stat-info">
-                            <h3>Remaining Funds</h3>
-                            <p class="stat-value" id="statRemainingFunds">—</p>
-                            <span class="stat-trend negative" id="trendRemaining">
-                                <i class="fas fa-arrow-down"></i> Loading...
-                            </span>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Funds Overview Chart -->
-                <div class="card">
-                    <div class="card-header">
-                        <h2>Funds Overview</h2>
-                        <select class="chart-select">
-                            <option>Last 6 Months</option>
-                            <option>Last Year</option>
-                            <option>All Time</option>
-                        </select>
-                    </div>
-                    <div class="card-body">
-                        <canvas id="fundsChart" class="chart-placeholder"></canvas>
-                        <div class="chart-legend">
-                            <span><i class="fas fa-circle" style="color: #1a56db;"></i> Allocated</span>
-                            <span><i class="fas fa-circle" style="color: #10b981;"></i> Available</span>
-                            <span><i class="fas fa-circle" style="color: #f59e0b;"></i> Disbursed</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Active Grants Table -->
-                <div class="card">
-                    <div class="card-header">
-                        <h2>Active Grants</h2>
-                        <a href="grants.html" class="view-all">View All <i class="fas fa-arrow-right"></i></a>
-                    </div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="data-table">
-                                <thead>
-                                    <tr>
-                                        <th>Grant Name</th>
-                                        <th>Budget</th>
-                                        <th>Applicants</th>
-                                        <th>Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <!-- Populated by dashboard.js -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Recent Applications Table -->
-                <div class="card">
-                    <div class="card-header">
-                        <h2>Recent Applications</h2>
-                        <a href="applications.html" class="view-all">View All <i class="fas fa-arrow-right"></i></a>
-                    </div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="data-table">
-                                <thead>
-                                    <tr>
-                                        <th>Applicant Name</th>
-                                        <th>Grant</th>
-                                        <th>Status</th>
-                                        <th>Date</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <!-- Populated by dashboard.js -->
-                                </tbody>
-                            </table>
-                        </div>
+                <div class="landing-hero-float landing-hero-float--2">
+                    <i class="fas fa-chart-line"></i>
+                    <div>
+                        <strong>Live Dashboard</strong>
+                        <span>Fund stats &amp; reports</span>
                     </div>
                 </div>
             </div>
-        </main>
-    </div>
-    
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+        </div>
+    </section>
+
+    <!-- Stats strip -->
+    <section class="landing-stats">
+        <div class="landing-container landing-stats-grid">
+            <div class="landing-stat">
+                <i class="fas fa-layer-group"></i>
+                <strong>End-to-End</strong>
+                <span>Grants → Review → Disburse</span>
+            </div>
+            <div class="landing-stat">
+                <i class="fas fa-shield-halved"></i>
+                <strong>Role-Based Access</strong>
+                <span>Admin, Reviewer &amp; Applicant</span>
+            </div>
+            <div class="landing-stat">
+                <i class="fas fa-bell"></i>
+                <strong>Real-Time Updates</strong>
+                <span>Notifications &amp; messaging</span>
+            </div>
+            <div class="landing-stat">
+                <i class="fas fa-file-export"></i>
+                <strong>Reports &amp; Export</strong>
+                <span>CSV &amp; date-range filters</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features -->
+    <section class="landing-section" id="features">
+        <div class="landing-container">
+            <div class="landing-section-header">
+                <span class="landing-label">Features</span>
+                <h2>Everything You Need to Run a Grant Program</h2>
+                <p>Built for institutions that need transparency, speed, and control over research funding workflows.</p>
+            </div>
+            <div class="landing-features-grid">
+                <article class="landing-feature-card">
+                    <div class="landing-feature-icon"><i class="fas fa-columns"></i></div>
+                    <h3>Kanban Review Board</h3>
+                    <p>Move applications through stages — Submitted, Under Review, Approved, or Rejected — with a visual drag-and-drop workflow.</p>
+                </article>
+                <article class="landing-feature-card">
+                    <div class="landing-feature-icon"><i class="fas fa-pen-to-square"></i></div>
+                    <h3>Multi-Step Applications</h3>
+                    <p>Applicants complete guided forms and upload supporting documents (PDF, DOC, images) before submission.</p>
+                </article>
+                <article class="landing-feature-card">
+                    <div class="landing-feature-icon"><i class="fas fa-chart-pie"></i></div>
+                    <h3>Fund Analytics</h3>
+                    <p>Admins see live fund statistics, Chart.js visualisations, and date-range reports at a glance.</p>
+                </article>
+                <article class="landing-feature-card">
+                    <div class="landing-feature-icon"><i class="fas fa-users"></i></div>
+                    <h3>Beneficiary Tracking</h3>
+                    <p>Track approved recipients, monitor disbursements, and export beneficiary data to CSV.</p>
+                </article>
+                <article class="landing-feature-card">
+                    <div class="landing-feature-icon"><i class="fas fa-envelope-open-text"></i></div>
+                    <h3>In-App Messaging</h3>
+                    <p>Communicate between admins and applicants without leaving the platform.</p>
+                </article>
+                <article class="landing-feature-card">
+                    <div class="landing-feature-icon"><i class="fas fa-user-shield"></i></div>
+                    <h3>User Management</h3>
+                    <p>Role-based access control for admins, reviewers, and applicants with secure JWT authentication.</p>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- How it works -->
+    <section class="landing-section landing-section--alt" id="how-it-works">
+        <div class="landing-container">
+            <div class="landing-section-header">
+                <span class="landing-label">How It Works</span>
+                <h2>Three Simple Steps to Get Started</h2>
+                <p>Create an account, explore open grants, and submit your application — login required for all portal actions.</p>
+            </div>
+            <div class="landing-steps">
+                <div class="landing-step">
+                    <div class="landing-step-num">1</div>
+                    <h3>Create Your Account</h3>
+                    <p>Register as an applicant or log in with your institutional credentials. Admins use a separate registration flow.</p>
+                    <a href="signup.html" class="landing-step-link">Sign up free <i class="fas fa-arrow-right"></i></a>
+                </div>
+                <div class="landing-step-connector" aria-hidden="true"><i class="fas fa-chevron-right"></i></div>
+                <div class="landing-step">
+                    <div class="landing-step-num">2</div>
+                    <h3>Browse Open Grants</h3>
+                    <p>Search and filter available grants by category, deadline, and funding amount once you're logged in.</p>
+                    <a href="login.html" class="landing-step-link">Log in to browse <i class="fas fa-arrow-right"></i></a>
+                </div>
+                <div class="landing-step-connector" aria-hidden="true"><i class="fas fa-chevron-right"></i></div>
+                <div class="landing-step">
+                    <div class="landing-step-num">3</div>
+                    <h3>Apply &amp; Track Progress</h3>
+                    <p>Complete the multi-step application form, upload documents, and receive status notifications as your application is reviewed.</p>
+                    <a href="login.html" class="landing-step-link">Start applying <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Portals -->
+    <section class="landing-section" id="portals">
+        <div class="landing-container">
+            <div class="landing-section-header">
+                <span class="landing-label">Two Portals, One Platform</span>
+                <h2>Built for Admins and Applicants Alike</h2>
+            </div>
+            <div class="landing-portals-grid">
+                <article class="landing-portal-card landing-portal-card--admin">
+                    <div class="landing-portal-header">
+                        <i class="fas fa-cogs"></i>
+                        <h3>Admin Portal</h3>
+                    </div>
+                    <ul>
+                        <li><i class="fas fa-check"></i> Dashboard with live fund statistics</li>
+                        <li><i class="fas fa-check"></i> Create and manage grants</li>
+                        <li><i class="fas fa-check"></i> Kanban application review</li>
+                        <li><i class="fas fa-check"></i> Approve / reject with full detail view</li>
+                        <li><i class="fas fa-check"></i> Beneficiaries &amp; CSV export</li>
+                        <li><i class="fas fa-check"></i> Reports &amp; user management</li>
+                    </ul>
+                    <a href="login.html" class="btn btn-outline btn-block">Admin Login</a>
+                </article>
+                <article class="landing-portal-card landing-portal-card--user">
+                    <div class="landing-portal-header">
+                        <i class="fas fa-user-graduate"></i>
+                        <h3>Applicant Portal</h3>
+                    </div>
+                    <ul>
+                        <li><i class="fas fa-check"></i> Browse and search open grants</li>
+                        <li><i class="fas fa-check"></i> Multi-step application forms</li>
+                        <li><i class="fas fa-check"></i> Document uploads (PDF, DOC, images)</li>
+                        <li><i class="fas fa-check"></i> Application status tracking</li>
+                        <li><i class="fas fa-check"></i> In-app messaging &amp; notifications</li>
+                        <li><i class="fas fa-check"></i> Profile management</li>
+                    </ul>
+                    <a href="signup.html" class="btn btn-primary btn-block">Create Applicant Account</a>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="landing-cta">
+        <div class="landing-container landing-cta-inner">
+            <h2>Ready to Apply for Research Funding?</h2>
+            <p>Log in or create an account to access grants, submit applications, and track your progress.</p>
+            <div class="landing-cta-actions">
+                <a href="signup.html" class="btn btn-white btn-large">Get Started</a>
+                <a href="login.html" class="btn btn-outline-white btn-large">Log In</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="landing-footer">
+        <div class="landing-container landing-footer-inner">
+            <div class="landing-footer-brand">
+                <a href="index.html" class="landing-logo">
+                    <i class="fas fa-hand-holding-heart"></i>
+                    <span>Grant System</span>
+                </a>
+                <p>Full-stack grant management for universities and research institutions.</p>
+            </div>
+            <div class="landing-footer-links">
+                <div>
+                    <h4>Get Started</h4>
+                    <a href="login.html">Log In</a>
+                    <a href="signup.html">Applicant Sign Up</a>
+                    <a href="admin-signup.html">Admin Registration</a>
+                </div>
+                <div>
+                    <h4>Learn More</h4>
+                    <a href="#features">Features</a>
+                    <a href="#how-it-works">How It Works</a>
+                    <a href="#portals">Portals</a>
+                </div>
+            </div>
+        </div>
+        <div class="landing-footer-bottom">
+            <div class="landing-container">
+                <p>&copy; 2026 Grant Management System. Final Year Project.</p>
+            </div>
+        </div>
+    </footer>
+
     <script src="assets/js/api.js"></script>
     <script src="assets/js/auth.js"></script>
-    <script src="assets/js/app.js"></script>
-    <script src="assets/js/dark-mode.js"></script>
-    <script src="assets/js/dashboard.js"></script>
+    <script src="assets/js/landing.js"></script>
 </body>
 </html>

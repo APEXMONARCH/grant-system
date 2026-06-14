@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Grant Management System
 
 A full-stack grant management platform for universities and research institutions. Admins can create and manage grants, review applications via a Kanban board, and track disbursements. Applicants can browse grants, submit multi-step applications with document uploads, and receive status notifications.
@@ -36,6 +35,10 @@ A full-stack grant management platform for universities and research institution
 - In-app messaging and notifications
 - Profile management
 
+### Public Landing Page
+- Overview of system capabilities (`index.html`)
+- Login required to browse grants, apply, or access portal features
+
 ---
 
 ## Project Structure
@@ -45,15 +48,21 @@ grant-system/
 ├── .htaccess                  ← Apache rewrite rules (root level)
 ├── .gitignore
 ├── README.md
+├── index.html                 ← Public landing page
+├── admin-dashboard.html       ← Admin dashboard (login required)
 │
 ├── assets/                    ← Frontend assets
 │   ├── css/
 │   │   ├── styles.css
+│   │   ├── landing.css
 │   │   └── user-dashboard.css
+│   ├── images/
+│   │   └── hero-grant-system.png
 │   └── js/
 │       ├── api.js             ← Central HTTP client
 │       ├── auth.js            ← JWT auth + route guards
 │       ├── app.js             ← Shared UI (sidebar, toasts, notifications)
+│       ├── landing.js         ← Landing page interactions
 │       ├── dashboard.js
 │       ├── grants.js
 │       ├── applications.js
@@ -131,6 +140,11 @@ In `httpd.conf`:
 
 **6. Open the app**
 ```
+http://localhost/grant-system/
+```
+
+The landing page is public. To use portal features, log in or create an account:
+```
 http://localhost/grant-system/login.html
 ```
 
@@ -181,7 +195,3 @@ When deploying to a live server:
 4. Set `DEV_MODE = false` in `auth.js`
 5. Remove `test_api.php`, `fix_admin.php`, `diagnostic.html` if present
 6. Make `api/uploads/` writable: `chmod -R 775 api/uploads/`
-=======
-# grant-system
-final year project
->>>>>>> ddc68412fc5ee3c258baa7609abb9a1c7660aea6

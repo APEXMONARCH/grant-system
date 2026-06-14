@@ -13,10 +13,10 @@
     <div class="auth-container">
         <div class="auth-card">
             <div class="auth-header">
-                <div class="auth-logo">
+                <a href="index.html" class="auth-logo" style="text-decoration:none;">
                     <i class="fas fa-hand-holding-heart"></i>
                     <h1>Grant System</h1>
-                </div>
+                </a>
                 <p class="auth-subtitle">Welcome back! Please login to your account</p>
             </div>
 
@@ -53,6 +53,8 @@
             <a href="signup.html" class="btn btn-secondary btn-large">Create Applicant Account</a>
 
             <div class="auth-footer">
+                <a href="index.html" class="link-small">← Back to Home</a>
+                &nbsp;·&nbsp;
                 <a href="#" class="link-small">Forgot Password?</a>
                 &nbsp;·&nbsp;
                 <a href="admin-signup.html" class="link-small" style="color:#6b7280;">Admin Registration</a>
@@ -70,7 +72,7 @@
     <script>
         // Redirect already-logged-in users
         if (Auth.isLoggedIn()) {
-            window.location.href = Auth.isAdmin() ? 'index.html' : 'user-index.html';
+            window.location.href = Auth.isAdmin() ? 'admin-dashboard.html' : 'user-index.html';
         }
 
         document.getElementById('loginForm').addEventListener('submit', async function(e) {
@@ -86,7 +88,7 @@
                 const user = await Auth.login(email, password);
                 showAlert('Login successful!', 'success');
                 setTimeout(() => {
-                    window.location.href = user.role === 'admin' ? 'index.html' : 'user-index.html';
+                    window.location.href = user.role === 'admin' ? 'admin-dashboard.html' : 'user-index.html';
                 }, 800);
             } catch (err) {
                 showAlert(err.message || 'Invalid credentials. Please try again.', 'error');

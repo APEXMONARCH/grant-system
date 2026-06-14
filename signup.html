@@ -126,7 +126,7 @@
     <script src="assets/js/dark-mode.js"></script>
     <script>
         if (Auth.isLoggedIn()) {
-            window.location.href = Auth.isAdmin() ? 'index.html' : 'user-index.html';
+            window.location.href = Auth.isAdmin() ? 'admin-dashboard.html' : 'user-index.html';
         }
 
         document.getElementById('signupForm').addEventListener('submit', async function(e) {

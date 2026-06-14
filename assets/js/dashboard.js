@@ -1,5 +1,5 @@
 /**
- * dashboard.js — Admin dashboard (index.html)
+ * dashboard.js — Admin dashboard (admin-dashboard.html)
  *
  * PHP endpoints:
  *   GET /api/dashboard/summary

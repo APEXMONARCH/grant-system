@@ -102,7 +102,7 @@
     <script>
         // Redirect if already logged in
         if (Auth.isLoggedIn()) {
-            window.location.href = Auth.isAdmin() ? 'index.html' : 'user-index.html';
+            window.location.href = Auth.isAdmin() ? 'admin-dashboard.html' : 'user-index.html';
         }
 
         function showAlert(msg, type) {
@@ -169,7 +169,7 @@
                 localStorage.setItem('auth_token', data.data.token);
                 localStorage.setItem('auth_user', JSON.stringify(data.data.user));
                 showAlert('Admin account created! Redirecting to dashboard...', 'success');
-                setTimeout(() => { window.location.href = 'index.html'; }, 1000);
+                setTimeout(() => { window.location.href = 'admin-dashboard.html'; }, 1000);
 
             } catch (err) {
                 showAlert('Network error. Check that your PHP backend is running.', 'error');

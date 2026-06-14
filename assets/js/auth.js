@@ -49,7 +49,7 @@ const Auth = (() => {
 
   function requireAuth()  { if (DEV_MODE) return true; if (!isLoggedIn()) { window.location.href = 'login.html'; return false; } return true; }
   function requireAdmin() { if (DEV_MODE) return true; if (!isLoggedIn()) { window.location.href = 'login.html'; return false; } if (!isAdmin()) { window.location.href = 'user-index.html'; return false; } return true; }
-  function requireUser()  { if (DEV_MODE) return true; if (!isLoggedIn()) { window.location.href = 'login.html'; return false; } if (isAdmin()) { window.location.href = 'index.html'; return false; } return true; }
+  function requireUser()  { if (DEV_MODE) return true; if (!isLoggedIn()) { window.location.href = 'login.html'; return false; } if (isAdmin()) { window.location.href = 'admin-dashboard.html'; return false; } return true; }
 
   async function login(email, password) {
     if (DEV_MODE) {
@@ -80,7 +80,7 @@ const Auth = (() => {
   async function logout() {
     if (!DEV_MODE) { try { await API.post('/auth/logout'); } catch { /* ignore */ } }
     API.clearToken();
-    window.location.href = 'login.html';
+    window.location.href = 'index.html';
   }
 
   return { login, register, logout, getUser, isLoggedIn, isAdmin, requireAuth, requireAdmin, requireUser };
