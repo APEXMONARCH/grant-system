@@ -6904,3 +6904,46 @@ body:not(.user-shell) .card-actions {
     background: var(--gray-600);
     color: var(--white);
 }
+
+/* ===== MODAL (disbursement) ===== */
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 1000;
+  display: none; align-items: center; justify-content: center;
+  background: rgba(0,0,0,.5); padding: var(--space-md);
+}
+.modal-overlay.open { display: flex; }
+.modal-box {
+  background: var(--white); border-radius: var(--radius-lg);
+  width: 100%; max-width: 440px; box-shadow: 0 20px 60px rgba(0,0,0,.3); overflow: hidden;
+}
+.modal-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: var(--space-md) var(--space-lg); border-bottom: 1px solid var(--gray-200);
+}
+.modal-head h3 { margin: 0; font-size: 1.1rem; }
+.modal-close {
+  background: none; border: none; font-size: 1.5rem; line-height: 1;
+  cursor: pointer; color: var(--gray-600);
+}
+.modal-body { padding: var(--space-lg); }
+.modal-body label {
+  display: block; margin: var(--space-md) 0 6px;
+  font-size: .85rem; font-weight: 600; color: var(--gray-700);
+}
+.modal-body input,
+.modal-body select,
+.modal-body textarea {
+  width: 100%; padding: .6rem .75rem; border: 1px solid var(--gray-300);
+  border-radius: var(--radius-sm); font-size: .9rem; background: var(--white); color: var(--gray-800);
+}
+.modal-sub { font-size: .9rem; color: var(--gray-600); margin: 0; }
+.modal-body .muted { color: var(--gray-500); font-weight: 400; }
+.modal-alert {
+  margin-top: var(--space-md); padding: .6rem .75rem; border-radius: var(--radius-sm);
+  background: #fee2e2; color: #7f1d1d; font-size: .85rem;
+}
+.modal-foot {
+  display: flex; justify-content: flex-end; gap: var(--space-sm);
+  padding: var(--space-md) var(--space-lg); border-top: 1px solid var(--gray-200);
+}
+.btn-small { padding: .35rem .7rem; font-size: .8rem; }

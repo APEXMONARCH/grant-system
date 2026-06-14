@@ -61,4 +61,35 @@ class Beneficiary {
         $rejected = array_map('intval', array_column($rows, 'rejected'));
         return ['labels' => $labels, 'approved' => $approved, 'rejected' => $rejected];
     }
+
+    // Single record joined with user + grant (for disbursement)
+    public static function findFull(int $id): ?array {
+        $stmt = db()->prepare('
+            SELECT b.*,
+                   CONCAT(u.first_name, " ", u.last_name) AS name,
+                   u.email,
+                   g.title AS grant_title
+            FROM beneficiaries b
+            JOIN users  u ON u.id = b.user_id
+            JOIN grants g ON g.id = b.grant_id
+            WHERE b.id = ?
+            LIMIT 1
+        ');
+        $stmt->execute([$id]);
+        return $stmt->fetch() ?: null;
+    }
+
+    // Mark a beneficiary as paid out
+    public static function disburse(int $id, float $amount, string $method, ?string $ref, ?string $note): void {
+        db()->prepare('
+            UPDATE beneficiaries
+            SET status          = "disbursed",
+                amount          = ?,
+                payment_method  = ?,
+                transaction_ref = ?,
+                note            = ?,
+                payment_date    = CURDATE()
+            WHERE id = ?
+        ')->execute([$amount, $method, $ref, $note, $id]);
+    }
 }

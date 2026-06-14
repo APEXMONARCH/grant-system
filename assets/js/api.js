@@ -12,7 +12,7 @@
 
 const API = (() => {
   // ─── CONFIG ────────────────────────────────────────────────
-  const BASE_URL = '/grant-system/api'; // ← update this to match your PHP API path
+  const BASE_URL = '/grant-system/api'; // ← XAMPP path: http://localhost/grant-system/api
 
   // ─── TOKEN HELPERS ─────────────────────────────────────────
   const getToken   = () => localStorage.getItem('auth_token');

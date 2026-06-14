@@ -4,11 +4,12 @@
 // ─────────────────────────────────────────────────────────────
 
 function getBearerToken(): ?string {
-    // Check all places Apache/XAMPP might put the Authorization header
+    $headers = function_exists('getallheaders') ? (getallheaders() ?: []) : [];
+
     $header = $_SERVER['HTTP_AUTHORIZATION']
            ?? $_SERVER['REDIRECT_HTTP_AUTHORIZATION']
-           ?? getallheaders()['Authorization']
-           ?? getallheaders()['authorization']
+           ?? $headers['Authorization']
+           ?? $headers['authorization']
            ?? '';
 
     if (preg_match('/Bearer\s+(\S+)/i', $header, $matches)) {

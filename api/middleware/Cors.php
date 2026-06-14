@@ -1,14 +1,20 @@
 <?php
 // ─────────────────────────────────────────────────────────────
-//  middleware/Cors.php
+//  middleware/Cors.php  (FIXED)
 //  Must be called before any output.
 // ─────────────────────────────────────────────────────────────
 
 function handleCors(): void {
-    $origin = $_SERVER['HTTP_ORIGIN'] ?? '*';
+    $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
 
-    // In production, replace '*' with your exact frontend URL
-    header('Access-Control-Allow-Origin: ' . (APP_ENV === 'production' ? FRONTEND_URL : '*'));
+    if (APP_ENV === 'production') {
+        header('Access-Control-Allow-Origin: ' . FRONTEND_URL);
+    } else {
+        // In dev, reflect the actual requesting origin so credentials work.
+        header('Access-Control-Allow-Origin: ' . ($origin !== '' ? $origin : '*'));
+    }
+
+    header('Vary: Origin');
     header('Access-Control-Allow-Methods: GET, POST, PUT, PATCH, DELETE, OPTIONS');
     header('Access-Control-Allow-Headers: Authorization, Content-Type, X-Requested-With');
     header('Access-Control-Allow-Credentials: true');

@@ -28,7 +28,7 @@ async function loadBeneficiaries() {
   const countEl = document.getElementById('beneficiariesCount');
   if (!tbody) return;
 
-  tbody.innerHTML = skeletonRows(5, 5);
+  tbody.innerHTML = skeletonRows(5, 6);
 
   try {
     const res   = await API.get('/beneficiaries', { page: benePage, limit: 20 });
@@ -52,10 +52,21 @@ async function loadBeneficiaries() {
             <td class="amount" style="font-weight:600;">${formatCurrency(b.amount)}</td>
             <td>${statusBadge(b.status)}</td>
             <td style="color:#6b7280;">${formatDate(b.date)}</td>
+            <td>
+              ${['paid','disbursed'].includes(b.status)
+                ? `<span class="badge success">Paid</span>`
+                : `<button class="btn-primary btn-small disburse-btn"
+                       data-id="${b.id}"
+                       data-name="${escapeHtml(b.name)}"
+                       data-grant="${escapeHtml(b.grant_title)}"
+                       data-amount="${b.amount ?? 0}">
+                     <i class="fas fa-paper-plane"></i> Disburse
+                   </button>`}
+            </td>
           </tr>`).join('')
-      : '<tr><td colspan="5" style="text-align:center;padding:32px;color:#9ca3af;">No beneficiaries found</td></tr>';
+      : '<tr><td colspan="6" style="text-align:center;padding:32px;color:#9ca3af;">No beneficiaries found</td></tr>';
   } catch (err) {
-    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:#ef4444;padding:24px;">${escapeHtml(err.message)}</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:#ef4444;padding:24px;">${escapeHtml(err.message)}</td></tr>`;
   }
 }
 
@@ -140,4 +151,74 @@ function skeletonRows(rows, cols) {
     <tr>${Array.from({ length: cols }, () =>
       `<td><div style="height:12px;background:#e5e7eb;border-radius:4px;animation:pulse 1.5s infinite;"></div></td>`
     ).join('')}</tr>`).join('');
+}
+
+// ─── DISBURSEMENT ──────────────────────────────────────────
+let disburseId = null;
+
+document.addEventListener('click', (e) => {
+  const btn = e.target.closest('.disburse-btn');
+  if (btn) openDisburse(btn.dataset);
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('disburseClose') ?.addEventListener('click', closeDisburse);
+  document.getElementById('disburseCancel')?.addEventListener('click', closeDisburse);
+  document.getElementById('disburseConfirm')?.addEventListener('click', confirmDisburse);
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeDisburse(); });
+});
+
+function openDisburse(d) {
+  disburseId = d.id;
+  document.getElementById('disburseRecipient').textContent = `Paying ${d.name} — ${d.grant}`;
+  document.getElementById('disburseAmount').value = d.amount || '';
+  document.getElementById('disburseMethod').value = 'Bank Transfer';
+  document.getElementById('disburseRef').value = '';
+  document.getElementById('disburseNote').value = '';
+  hideDisburseAlert();
+  document.getElementById('disburseModal').classList.add('open');
+}
+
+function closeDisburse() {
+  document.getElementById('disburseModal')?.classList.remove('open');
+  disburseId = null;
+}
+
+function showDisburseAlert(msg) {
+  const el = document.getElementById('disburseAlert');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+function hideDisburseAlert() {
+  const el = document.getElementById('disburseAlert');
+  if (el) el.style.display = 'none';
+}
+
+async function confirmDisburse() {
+  if (!disburseId) return;
+  const amount = parseFloat(document.getElementById('disburseAmount').value);
+  const method = document.getElementById('disburseMethod').value;
+  const ref    = document.getElementById('disburseRef').value.trim();
+  const note   = document.getElementById('disburseNote').value.trim();
+  const btn    = document.getElementById('disburseConfirm');
+
+  if (!amount || amount <= 0) { showDisburseAlert('Enter a valid amount greater than zero.'); return; }
+
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+  try {
+    const res = await API.patch(`/beneficiaries/${disburseId}/disburse`, {
+      amount, payment_method: method, transaction_ref: ref, note,
+    });
+    closeDisburse();
+    if (typeof showToast === 'function') showToast(res.message || 'Funds disbursed.', 'success');
+    benePage = 1;
+    loadBeneficiaries();
+    loadCharts();
+  } catch (err) {
+    showDisburseAlert(err.message || 'Disbursement failed.');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = 'Confirm Payment';
+  }
 }
